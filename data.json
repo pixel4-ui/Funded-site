@@ -1,0 +1,14 @@
+{
+  "admin": {
+    "salt": "initialsalt123",
+    "passwordHash": "PLACEHOLDER_WILL_BE_SET_BY_SETUP_SCRIPT"
+  },
+  "wallet": {
+    "network": "USDT (TRC20)",
+    "address": "YOUR_WALLET_ADDRESS_HERE"
+  },
+  "packages": [
+    { "id": "1", "name": "Chota Package", "size": "$5,000", "price": "$29", "profitSplit": "80%", "features": ["Instant Access", "No time limit", "80% profit split"] },
+    { "id": "2", "name": "Bara Package", "size": "$100,000", "price": "$399", "profitSplit": "92%", "features": ["Instant Access", "No time limit", "92% profit split", "Priority payouts"] }
+  ]
+}
