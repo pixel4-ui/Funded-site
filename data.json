@@ -1,5 +1,11 @@
 {
   "siteName": "FUNDEDPRO",
+  "siteSettings": {
+    "primaryColor": "#00ff88",
+    "secondaryColor": "#111111",
+    "backgroundColor": "#000000",
+    "textColor": "#ffffff"
+  },
   "hero": {
     "badge": "🔒 Trusted by 2,400+ Traders",
     "title": "Trade With Our Capital.",
