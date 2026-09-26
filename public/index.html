@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">FUNDEDPRO - 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Outfit',sans-serif}
+body{background:#050b06;color:#fff;overflow-x:hidden}
+.ticker{background:#00ff88;color:#000;padding:7px 0;white-space:nowrap;overflow:hidden;font-weight:800;font-size:13px}
+.ticker-track{display:inline-block;animation:scroll 45s linear infinite}
+@keyframes scroll{0%{transform:translateX(10%)}100%{transform:translateX(-100%)}}
+nav{display:flex;justify-content:space-between;padding:18px 6%;align-items:center;background:rgba(5,11,6,0.85);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;border-bottom:1px solid #00ff8815}
+.logo{font-weight:900;font-size:26px;color:#00ff88;text-shadow:0 0 20px #00ff88aa}
+.hero{padding:70px 6%;display:grid;grid-template-columns:1.15fr.85fr;gap:40px;align-items:center}
+.badge{display:inline-block;background:#00ff8815;border:1px solid #00ff8833;color:#00ff88;padding:6px 14px;border-radius:30px;font-size:13px;font-weight:700;margin-bottom:18px}
+.h-title{font-size:62px;font-weight:900;line-height:.95;transform:perspective(900px) rotateY(-4deg)}
+.h-title span{color:#00ff88}
+.h-sub{margin:18px 0;color:#a8b5a8;font-size:18px;line-height:1.6}
+.card3d{background:linear-gradient(145deg,#0f1f11,#0a120a);border:1px solid #00ff8822;border-radius:22px;padding:28px;box-shadow:0 25px 70px #000, inset 0 1px 0 #ffffff0f;transition:.35s}
+.card3d:hover{transform:translateY(-8px);box-shadow:0 35px 90px #00ff8830}
+.btn{background:#00ff88;color:#000;padding:15px 28px;border-radius:12px;font-weight:900;border:none;cursor:pointer;font-size:15px;box-shadow:0 0 28px #00ff8866;transition:.25s;display:inline-flex;justify-content:center}
+.btn:hover{transform:scale(1.04)}
+.btn-outline{background:transparent;color:#00ff88;border:1px solid #00ff88}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:30px 6%}
+.stat{text-align:center;padding:26px;background:rgba(0,255,136,0.05);border:1px solid #00ff8811;border-radius:20px}
+.stat h2{font-size:36px;color:#00ff88}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;padding:40px 6%}
+.plan{position:relative;text-align:left}
+.plan.popular{border-color:#00ff88;transform:scale(1.03)}
+.badge-pop{position:absolute;top:14px;right:-32px;background:#00ff88;color:#000;padding:5px 40px;transform:rotate(45deg);font-weight:800;font-size:11px}
+.feature-list{list-style:none;color:#a8b5a8;line-height:2.2;margin:14px 0;font-size:14px}
+.feature-list li:before{content:"✔ ";color:#00ff88}
+.reviews{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:30px 6%}
+.rev{background:#101a10;padding:20px;border-radius:16px;border-left:3px solid #00ff88}
+.faq{padding:40px 6%;max-width:900px;margin:auto}
+.faq-item{background:#0f1a0f;margin:10px 0;padding:18px 20px;border-radius:12px;cursor:pointer;border:1px solid #ffffff0a}
+.popup{position:fixed;bottom:22px;left:18px;background:#121d12;border:1px solid #00ff88;padding:14px 18px;border-radius:12px;display:none;z-index:9999}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:10000;padding:18px}
+.modal{background:#0e1a0f;border:1px solid #00ff8833;border-radius:20px;max-width:520px;width:100%;padding:24px;max-height:90vh;overflow-y:auto}
+.wallet-opt{border:1px solid #ffffff15;padding:14px;border-radius:12px;margin:10px 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.wallet-opt.selected{border-color:#00ff88;background:#00ff8812}
+.broker-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
+.broker-opt{border:1px solid #ffffff15;padding:12px;border-radius:10px;text-align:center;cursor:pointer;font-size:13px}
+.broker-opt.selected{border-color:#00ff88;background:#00ff8812;color:#00ff88;font-weight:800}
+.shape3d{width:180px;height:180px;margin:26px auto 0;perspective:900px;filter:drop-shadow(0 0 40px #00e5a080)}
+.cube{width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:spin 12s linear infinite}
+.face{position:absolute;width:180px;height:180px;border:1px solid rgba(0,229,160,0.35);background:linear-gradient(135deg, rgba(0,229,160,0.08), rgba(59,130,246,0.08))}
+.f1{transform:translateZ(90px)}.f2{transform:rotateY(90deg) translateZ(90px)}.f3{transform:rotateY(180deg) translateZ(90px)}
+.f4{transform:rotateY(-90deg) translateZ(90px)}.f5{transform:rotateX(90deg) translateZ(90px)}.f6{transform:rotateX(-90deg) translateZ(90px)}
+@keyframes spin{from{transform:rotateX(0) rotateY(0)}to{transform:rotateX(360deg) rotateY(360deg)}}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.h-title{font-size:38px}.plans,.reviews,.stats{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="ticker"><div class="ticker-track" id="tickerTrack">Loading Forex...</div></div>
+<nav><div class="logo" id="siteName">FUNDEDPRO</div><div style="font-size:13px"><span id="usersTop">2,400+</span> Traders • Payouts: <span id="payoutTop" style="color:#00ff88">$1.2M+</span> • <a href="/admin.html" style="color:#666;text-decoration:none">Admin</a></div></nav>
+<section class="hero">
+<div>
+<div class="badge" id="heroBadge">Trusted by 2,400+ Traders</div>
+<h1 class="h-title" id="heroTitle">Trade With Our Capital. <span id="heroAccent">Keep Up To 92% Profit.</span></h1>
+<p class="h-sub" id="heroSub">Skip evaluation stress — get instantly funded accounts up to $100,000 and start trading today.</p>
+<button class="btn" onclick="document.getElementById('plans').scrollIntoView({behavior:'smooth'})">START CHALLENGE →</button>
+<div style="margin-top:24px;display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:#a8b5a8"><div>✔ 92% Split</div><div>✔ 24H Payout</div><div>✔ No Time Limit</div><div>✔ Scaling</div></div>
+<div class="shape3d"><div class="cube"><div class="face f1"></div><div class="face f2"></div><div class="face f3"></div><div class="face f4"></div><div class="face f5"></div><div class="face f6"></div></div></div>
+</div>
+<div class="card3d"><h3 style="color:#00ff88">What is Funded Account?</h3><br><p style="color:#a8b5a8;line-height:1.7;font-size:14px">A funded trading account is capital provided by a prop firm. You trade, we take the risk. Get $5k to $200k, keep up to 92% profit, scale up to $2M. No personal loss.</p><br><div class="stat" style="margin:0"><h2 id="payoutStat">$1.2M+</h2><p>Total Paid</p></div></div>
+</section>
+<div class="stats" id="stats"></div>
+<h2 style="text-align:center;margin-top:10px">Choose Your Funding</h2>
+<div class="plans" id="plans">Loading...</div>
+<section style="text-align:center;padding:50px 6%;background:radial-gradient(600px at 50% 0%,#00ff8815,transparent)"><h2>Instant Crypto Payment</h2><p style="color:#aaa;margin:10px;font-size:14px">Pay via TRC20 / BEP20 / BTC. Activation in 10-30 mins.</p><div id="qrList"></div></section>
+<h2 style="text-align:center;margin-top:50px">What Traders Say</h2><div class="reviews" id="reviews"></div>
+<div class="faq" id="faq"></div>
+<footer style="text-align:center;padding:30px;color:#666;border-top:1px solid #ffffff0a;margin-top:40px" id="footer">© 2026 FundedPro</footer>
+<div class="popup" id="joinPopup"></div>
+<div class="modal-bg" id="buyModal">
+<div class="modal">
+<h2>Complete Your Order</h2><p style="color:#a8b5a8;font-size:13px;margin:6px 0 16px" id="selectedPackageName">Select package</p>
+<label style="font-size:13px;color:#00ff88;font-weight:700">1. Select Broker</label>
+<div class="broker-grid" id="brokerList"></div>
+<label style="font-size:13px;color:#00ff88;font-weight:700;margin-top:10px;display:block">2. Select Payment Wallet</label>
+<div id="walletList"></div>
+<div id="walletDetail" style="display:none;margin-top:16px;background:#00000055;padding:16px;border-radius:12px;text-align:center">
+<img id="qrImg" src="" style="width:180px;height:180px;border-radius:12px;border:3px solid #00ff88;display:none;margin:0 auto 10px">
+<div style="font-size:12px;color:#a8b5a8;margin-bottom:6px" id="walletNetwork"></div>
+<code id="walletAddress" style="background:#111;padding:10px 14px;border-radius:8px;word-break:break-all;display:block;border:1px solid #00ff8822;font-size:12px"></code><br>
+<button class="btn btn-outline" style="width:100%" onclick="copyAddr()">Copy Address</button>
+<p style="font-size:11px;color:#666;margin-top:10px">After payment, send TXID to support. Credentials emailed in 10-30 mins.</p>
+</div>
+<div style="display:flex;gap:10px;margin-top:18px"><button class="btn btn-outline" style="flex:1" onclick="closeBuyModal()">Close</button><button class="btn" style="flex:1" onclick="confirmOrder()">I Have Paid →</button></div>
+</div>
+</div>
+<script>
+let SITE_DATA=null,selectedBroker=null,selectedWallet=null,selectedPackage=null;
+async function load(){
+  try{
+    let res=await fetch('/api/data'); let c=await res.json(); SITE_DATA=c;
+    document.getElementById('siteName').innerText=c.siteName||'FUNDEDPRO';
+    document.getElementById('pageTitle').innerText=c.siteName||'FUNDEDPRO';
+    if(c.hero){
+      document.getElementById('heroBadge').innerText=c.hero.badge||'';
+      document.getElementById('heroTitle').childNodes[0].textContent=(c.hero.title||'Trade With Our Capital. ')+' ';
+      document.getElementById('heroAccent').innerText=c.hero.accent||'';
+      document.getElementById('heroSub').innerText=c.hero.subtitle||'';
+    }
+    document.getElementById('footer').innerText=c.footer||'© 2026 FundedPro';
+    if(c.stats){ document.getElementById('usersTop').innerText=c.stats[0]?.number||'2,400+'; document.getElementById('payoutTop').innerText=c.stats[1]?.number||'$1.2M+'; document.getElementById('payoutStat').innerText=c.stats[1]?.number||'$1.2M+'; let sHtml=''; c.stats.forEach(s=>{sHtml+=`<div class="stat"><h2>${s.number}</h2><p>${s.label}</p></div>`}); document.getElementById('stats').innerHTML=sHtml;
+      const forexCoins=['EURUSD +0.42%','BTCUSD $67,432 ▲2.1%','XAUUSD $2,341 ▲0.8%','GBPUSD +0.18%','ETHUSD $3,812 ▲1.4%','NASDAQ +1.2%','SPX500 +0.9%','TRC20 INSTANT'];
+      const baseTicker=forexCoins.map(c=>`<span>💹 <b>${c}</b></span>`).join(' • ');
+      document.getElementById('tickerTrack').innerHTML=baseTicker+' • '+c.stats.map(s=>`<span>🔥 <b>${s.number}</b> ${s.label}</span>`).join(' • ')+' • '+baseTicker;
+    }
+    let pHtml=''; (c.packages||[]).forEach(p=>{pHtml+=`<div class="card3d plan ${p.popular?'popular':''}">${p.popular?'<div class="badge-pop">POPULAR</div>':''}<h3>${p.name}</h3><div style="color:#aaa;font-size:13px;margin:6px 0">${p.size} Account • ${p.profitSplit} Split</div><h1 style="font-size:42px;margin:12px 0;color:#00ff88">${p.price}</h1><ul class="feature-list">${(p.features||[]).map(f=>`<li>${f}</li>`).join('')}</ul><button class="btn" style="width:100%;margin-top:10px" onclick="openBuyModal('${p.id}')">BUY NOW →</button></div>`}); document.getElementById('plans').innerHTML=pHtml||'No packages';
+    let qrHtml=''; (c.wallets||[]).forEach(w=>{qrHtml+=`<div style="display:inline-block;margin:12px;background:#111;padding:12px;border-radius:12px;border:1px solid #ffffff0f"><div style="font-size:12px;color:#00ff88;font-weight:700">${w.network}</div><div style="font-size:11px;word-break:break-all;margin-top:6px">${w.address}</div></div>`}); document.getElementById('qrList').innerHTML=qrHtml;
+    let revHtml=''; (c.testimonials||[]).forEach(r=>{revHtml+=`<div class="rev"><div style="display:flex;align-items:center;gap:10px"><div style="width:38px;height:38px;background:#00ff8822;color:#00ff88;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800">${r.initials||r.name?.[0]}</div><div><b style="font-size:14px">${r.name}</b><div style="font-size:11px;color:#666">${r.role||''}</div></div></div><p style="margin:12px 0;font-size:13px;color:#a8b5a8">"${r.text}"</p></div>`}); document.getElementById('reviews').innerHTML=revHtml;
+    let faqHtml='<h2 style="text-align:center;margin-bottom:18px">FAQ</h2>'; (c.faq||[]).forEach(f=>{faqHtml+=`<div class="faq-item" onclick="this.querySelector('p').style.display=this.querySelector('p').style.display==='none'?'block':'none'"><b>${f.q}</b><p style="display:none;margin-top:10px;color:#a8b5a8;font-size:13px">${f.a}</p></div>`}); document.getElementById('faq').innerHTML=faqHtml;
+    renderBrokers(); renderWallets();
+  }catch(e){console.error(e); document.getElementById('plans').innerText='Failed to load. Refresh.'}
+}
+function renderBrokers(){ if(!SITE_DATA) return; let html=''; (SITE_DATA.brokers||[]).forEach(b=>{html+=`<div class="broker-opt ${selectedBroker===b.name?'selected':''}" onclick="selectBroker('${b.name}')">${b.name}</div>`}); document.getElementById('brokerList').innerHTML=html; }
+function renderWallets(){ if(!SITE_DATA) return; let html=''; (SITE_DATA.wallets||[]).forEach((w,i)=>{html+=`<div class="wallet-opt ${selectedWallet===i?'selected':''}" onclick="selectWallet(${i})"><div><b style="font-size:13px">${w.network}</b><div style="font-size:11px;color:#666">${w.address?.slice(0,24)}...</div></div><div style="color:#00ff88">→</div></div>`}); document.getElementById('walletList').innerHTML=html; }
+function selectBroker(name){selectedBroker=name; renderBrokers();}
+function selectWallet(i){selectedWallet=i; renderWallets(); let w=SITE_DATA.wallets[i]; document.getElementById('walletDetail').style.display='block'; document.getElementById('walletNetwork').innerText=w.network; document.getElementById('walletAddress').innerText=w.address; let qr=document.getElementById('qrImg'); if(w.qrImage){qr.src=w.qrImage; qr.style.display='block';} else qr.style.display='none';}
+function openBuyModal(packageId){selectedPackage=SITE_DATA.packages.find(p=>p.id==packageId); if(!selectedPackage) return; document.getElementById('selectedPackageName').innerText=`${selectedPackage.name} - ${selectedPackage.size} for ${selectedPackage.price}`; selectedBroker=null; selectedWallet=null; document.getElementById('walletDetail').style.display='none'; renderBrokers(); renderWallets(); document.getElementById('buyModal').style.display='flex';}
+function closeBuyModal(){document.getElementById('buyModal').style.display='none';}
+function copyAddr(){navigator.clipboard.writeText(document.getElementById('walletAddress').innerText); alert('Address copied!');}
+function confirmOrder(){ if(!selectedBroker){alert('Please select broker');return;} if(selectedWallet===null){alert('Please select wallet');return;} alert(`Order noted!\nPackage: ${selectedPackage.name}\nBroker: ${selectedBroker}\nWallet: ${SITE_DATA.wallets[selectedWallet].network}\n\nSend payment + TXID to support.`); closeBuyModal();}
+load();
+const names=['Ahmed','Bilal','Hamza','Usman','Sana','Ayesha','Hassan','Fatima','Zain','Noor','Alex','David','John'];
+setInterval(()=>{let n=names[Math.floor(Math.random()*names.length)]; let amt=['$15k','$25k','$50k','$100k'][Math.floor(Math.random()*4)]; let el=document.getElementById('joinPopup'); el.innerHTML=`🔥 <b>${n}</b> just got funded with <b style="color:#00ff88">${amt}</b>`; el.style.display='block'; setTimeout(()=>el.style.display='none',3500);},3000);
+document.getElementById('buyModal').addEventListener('click',e=>{if(e.target.id==='buyModal') closeBuyModal();});
+</script>
+</body>
+</html>
