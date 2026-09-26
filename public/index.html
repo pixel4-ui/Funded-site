@@ -11,7 +11,7 @@ html,body{overflow-x:hidden;width:100%;background:#05070d;color:#e8ecf3;font-fam
 h1,h2,h3{font-family:Space Grotesk,sans-serif}
 :root{--bg:#05070d;--card:#0d1220;--accent:#00e5a0;--border:#1c2333;--muted:#8892a6}
 .top-bar{background:linear-gradient(90deg,#00e5a0,#00b37a);color:#000;text-align:center;padding:7px 10px;font-size:12px;font-weight:700}
-.ticker{background:#0a0f1e;border-bottom:1px solid var(--border);padding:8px 0;overflow:hidden;white-space:nowrap;position:relative}
+.ticker{background:#0a0f1e;border-bottom:1px solid var(--border);padding:8px 0;overflow:hidden;white-space:nowrap}
 .ticker-track{display:inline-block;animation:scroll 30s linear infinite}
 .ticker-item{display:inline-block;margin:0 30px;font-size:12px;color:var(--muted)}
 .ticker-item span{color:var(--accent);font-weight:700}
@@ -54,7 +54,6 @@ header{position:sticky;top:0;z-index:100;background:rgba(5,7,13,0.92);backdrop-f
 .faq-q{display:flex;justify-content:space-between;font-weight:600;font-size:14px}
 .faq-a{color:var(--muted);font-size:12px;margin-top:10px;display:none}
 .faq-item.active .faq-a{display:block}
-/* MODAL 3 STEPS */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:9999;padding:12px}
 .modal-overlay.active{display:flex}
 .modal{background:var(--card);border:1px solid var(--border);border-radius:18px;max-width:480px;width:95%;max-height:92vh;overflow-y:auto;padding:20px;position:relative}
@@ -73,13 +72,12 @@ header{position:sticky;top:0;z-index:100;background:rgba(5,7,13,0.92);backdrop-f
 .input-field{width:100%;padding:11px;margin:5px 0;background:#05070d;border:1px solid var(--border);border-radius:8px;color:#fff;font-size:13px}
 .step-title{color:var(--accent);font-weight:700;font-size:13px;margin:14px 0 8px}
 .back-btn{background:transparent;color:var(--muted);border:1px solid var(--border);padding:6px 12px;border-radius:16px;font-size:11px;cursor:pointer;margin-bottom:10px}
-/* NEW JOINING POPUP */
 .join-popup{position:fixed;bottom:20px;left:20px;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:12px;padding:12px 16px;display:flex;gap:10px;align-items:center;z-index:5000;box-shadow:0 10px 30px rgba(0,0,0,0.5);transform:translateX(-120%);transition:0.5s;max-width:300px}
 .join-popup.show{transform:translateX(0)}
 .join-popup .dot{width:8px;height:8px;background:#00e5a0;border-radius:50%;animation:pulse 2s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,229,160,0.7)}70%{box-shadow:0 0 0 8px rgba(0,229,160,0)}100%{box-shadow:0 0 0 0 rgba(0,229,160,0)}}
 footer{padding:24px 5%;text-align:center;border-top:1px solid var(--border);color:var(--muted);font-size:11px;margin-top:30px}
-@media(max-width:600px){.nav a{display:none}.ticker-item{margin:0 15px}}
+@media(max-width:600px){.nav a{display:none}}
 </style>
 </head>
 <body>
@@ -93,11 +91,9 @@ footer{padding:24px 5%;text-align:center;border-top:1px solid var(--border);colo
 <span class="ticker-item">NASDAQ <span class="up">18,420 +1.1%</span></span>
 <span class="ticker-item">BTC/USD <span class="up">$67,420 +1.2%</span></span>
 <span class="ticker-item">ETH/USD <span class="up">$3,210 +2.4%</span></span>
-<span class="ticker-item">EUR/USD <span class="down">1.0845 -0.3%</span></span>
-<span class="ticker-item">GBP/USD <span class="up">1.2710 +0.5%</span></span>
 </div></div>
 
-<header><div class="logo"><div class="logo-icon">MTF</div> MTFundedTrader</div><div class="nav"><a href="#steps">How it Works</a><a href="#packages">Pricing</a><a href="#reviews">Reviews</a><button class="btn-get" onclick="document.getElementById('packages').scrollIntoView({behavior:'smooth'})">Get Funded</button></div></header>
+<header><div class="logo"><div class="logo-icon">MTF</div> MTFundedTrader</div><div class="nav"><a href="#steps">How It Works</a><a href="#packages">Pricing</a><a href="#reviews">Reviews</a><button class="btn-get" onclick="document.getElementById('packages').scrollIntoView({behavior:'smooth'})">Get Funded</button></div></header>
 
 <section class="hero"><h1>The Future Starts<br>With <span>MTFundedTrader</span></h1><p class="hero-sub">Join the elite prop firm that funds skilled traders. Get up to $200k funding, 90% profit split, and instant payouts. No hidden fees.</p><div class="hero-btns"><button class="btn-primary" onclick="document.getElementById('packages').scrollIntoView({behavior:'smooth'})">Start Challenge →</button><button class="btn-outline">Join Discord (2.4k+)</button></div><div style="margin-top:18px;color:var(--muted);font-size:12px">★★★★★ Excellent 4.9/5 • Trusted by 2,400+ Traders</div></section>
 
@@ -105,27 +101,26 @@ footer{padding:24px 5%;text-align:center;border-top:1px solid var(--border);colo
 <div><div class="stat-num">$2.1M+</div><div class="stat-label">Total Payouts</div></div>
 <div><div class="stat-num">2,400+</div><div class="stat-label">Funded Traders</div></div>
 <div><div class="stat-num">89%</div><div class="stat-label">Payout Rate</div></div>
-<div><div class="stat-num">14 Days</div><div class="stat-label">Avg to Funded</div></div>
+<div><div class="stat-num">14 Days</div><div class="stat-label">Average to Funded</div></div>
 </div>
 
-<section class="steps" id="steps"><div class="steps-header"><div style="display:inline-block;background:rgba(0,229,160,0.1);color:var(--accent);padding:5px 12px;border-radius:16px;font-size:10px;font-weight:700;margin-bottom:10px">HOW IT WORKS</div><h2>Just 3 Simple Steps 🚀</h2><p style="color:var(--muted);font-size:13px">From challenge to funded trader in days, not months</p></div><div class="steps-grid"><div class="step-card"><div class="step-num">STEP 01</div><div class="step-icon">📁</div><h3>Challenge</h3><p style="color:var(--muted);font-size:12.5px">Choose your account size and show your trading skills. Achieve 8% profit target with proper risk management. No time limits.</p></div><div class="step-card"><div class="step-num">STEP 02</div><div class="step-icon">💎</div><h3>Get Funded</h3><p style="color:var(--muted);font-size:12.5px">Pass the challenge and get funded instantly. Access up to $200k capital with 90% profit split. Scale to $1M.</p></div><div class="step-card"><div class="step-num">STEP 03</div><div class="step-icon">💸</div><h3>Payouts</h3><p style="color:var(--muted);font-size:12.5px">Request your first payout after just 14 days. Bi-weekly payouts, no minimum, crypto/bank in 24h.</p></div></div></section>
+<section class="steps" id="steps"><div class="steps-header"><div style="display:inline-block;background:rgba(0,229,160,0.1);color:var(--accent);padding:5px 12px;border-radius:16px;font-size:10px;font-weight:700;margin-bottom:10px">HOW IT WORKS</div><h2>Just 3 Simple Steps 🚀</h2><p style="color:var(--muted);font-size:13px">From challenge to funded trader in days, not months</p></div><div class="steps-grid"><div class="step-card"><div class="step-num">STEP 01</div><div class="step-icon">📁</div><h3>Challenge</h3><p style="color:var(--muted);font-size:12.5px">Choose your account size and show your trading skills. Achieve 8% profit target with proper risk management. No time limits.</p></div><div class="step-card"><div class="step-num">STEP 02</div><div class="step-icon">💎</div><h3>Get Funded</h3><p style="color:var(--muted);font-size:12.5px">Pass the challenge and get funded instantly. Access up to $200k capital with 90% profit split. Scale to $1M.</p></div><div class="step-card"><div class="step-num">STEP 03</div><div class="step-icon">💸</div><h3>Payouts</h3><p style="color:var(--muted);font-size:12.5px">Request your first payout after just 14 days. Bi-weekly payouts, no minimum, crypto and bank transfer in 24 hours.</p></div></div></section>
 
 <section class="reviews" id="reviews"><div class="steps-header"><h2>Trader Reviews ⭐</h2><p style="color:var(--muted);font-size:13px">What our funded traders say</p></div><div class="review-grid">
-<div class="review-card"><div class="review-top"><div class="avatar">AK</div><div><div style="font-size:13px;font-weight:600">Ahmed Khan</div><div class="stars">★★★★★</div></div></div><p style="font-size:12px;color:var(--muted)">Best prop firm! Got funded in 10 days, payout in 24 hours. 90% split is real. Highly recommend MTF!</p></div>
+<div class="review-card"><div class="review-top"><div class="avatar">AK</div><div><div style="font-size:13px;font-weight:600">Ahmed Khan</div><div class="stars">★★★★★</div></div></div><p style="font-size:12px;color:var(--muted)">Best prop firm! Got funded in 10 days, payout in 24 hours. 90% profit split is real. Highly recommend MTF!</p></div>
 <div class="review-card"><div class="review-top"><div class="avatar">SR</div><div><div style="font-size:13px;font-weight:600">Sarah R.</div><div class="stars">★★★★★</div></div></div><p style="font-size:12px;color:var(--muted)">Passed $50k challenge, now funded with $100k. Support team is amazing. No hidden rules.</p></div>
 <div class="review-card"><div class="review-top"><div class="avatar">MJ</div><div><div style="font-size:13px;font-weight:600">Mike Johnson</div><div class="stars">★★★★★</div></div></div><p style="font-size:12px;color:var(--muted)">3rd payout received! $4,200 total. MTF is legit. EAs allowed, news trading allowed - perfect!</p></div>
-<div class="review-card"><div class="review-top"><div class="avatar">FA</div><div><div style="font-size:13px;font-weight:600">Fahad Ali</div><div class="stars">★★★★★</div></div></div><p style="font-size:12px;color:var(--muted)">Pakistan se hun, Exness broker pe trading karta hun. USDT TRC20 se payment kiya, 30 min me account active!</p></div>
+<div class="review-card"><div class="review-top"><div class="avatar">FA</div><div><div style="font-size:13px;font-weight:600">Fahad Ali</div><div class="stars">★★★★★</div></div></div><p style="font-size:12px;color:var(--muted)">From Pakistan, trading on Exness broker. Paid via USDT TRC20, account activated in 30 minutes!</p></div>
 </div></section>
 
 <section class="packages" id="packages"><div class="steps-header"><h2>Choose Your Funding</h2><p style="color:var(--muted);font-size:13px">All packages include MT5, EAs allowed, News trading allowed, No time limit</p></div><div class="pkg-grid" id="pkgGrid">Loading packages...</div></section>
 
-<section class="faq"><div class="steps-header"><h2>FAQ</h2></div>
-<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-q"><span>How fast do I get funded?</span><span>+</span></div><div class="faq-a">After passing challenge, you get funded instantly within 24 hours. No verification needed.</div></div>
-<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-q"><span>Which brokers do you support?</span><span>+</span></div><div class="faq-a">We support Exness, IC Markets, and other MT5 brokers. You can select broker at checkout.</div></div>
-<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-q"><span>What payment methods?</span><span>+</span></div><div class="faq-a">USDT TRC20, USDT BEP20, BTC, and more. All crypto payments verified within 30 minutes.</div></div>
+<section class="faq"><div class="steps-header"><h2>Frequently Asked Questions</h2></div>
+<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-q"><span>How fast do I get funded?</span><span>+</span></div><div class="faq-a">After passing the challenge, you get funded instantly within 24 hours. No additional verification needed.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-q"><span>Which brokers do you support?</span><span>+</span></div><div class="faq-a">We support Exness, IC Markets, and other MT5 brokers. You can select your preferred broker at checkout.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-q"><span>What payment methods are available?</span><span>+</span></div><div class="faq-a">USDT TRC20, USDT BEP20, BTC, and more. All crypto payments are verified within 30 minutes.</div></div>
 </section>
 
-<!-- PAYMENT MODAL - 3 STEPS: BROKER → TRC20/BEP20/BTC → QR + I DONE PAYMENT -->
 <div class="modal-overlay" id="payModal">
 <div class="modal">
 <div class="modal-close" onclick="closePay()">✕</div>
@@ -147,9 +142,9 @@ footer{padding:24px 5%;text-align:center;border-top:1px solid var(--border);colo
 <div id="walletDetail"></div>
 <div style="margin-top:14px"><label style="font-size:12px;font-weight:600">Upload Payment Screenshot *</label>
 <div class="upload-box" onclick="document.getElementById('ssFile').click()"><div id="uploadText">📤 Click to upload screenshot<br><span style="font-size:10px;color:var(--muted)">JPG, PNG up to 5MB</span></div><img id="ssPreview" class="upload-preview"><input type="file" id="ssFile" accept="image/*" style="display:none"><input type="hidden" id="ssBase64"></div></div>
-<div style="margin-top:10px"><label style="font-size:12px">Your Name *</label><input type="text" id="custName" placeholder="Full Name" class="input-field"></div>
-<div><label style="font-size:12px">Your Email *</label><input type="email" id="custEmail" placeholder="email@example.com" class="input-field"></div>
-<div><label style="font-size:12px">Transaction ID</label><input type="text" id="txId" placeholder="Exness Tx ID" class="input-field"></div>
+<div style="margin-top:10px"><label style="font-size:12px">Your Full Name *</label><input type="text" id="custName" placeholder="Enter your full name" class="input-field"></div>
+<div><label style="font-size:12px">Your Email Address *</label><input type="email" id="custEmail" placeholder="Enter your email address" class="input-field"></div>
+<div><label style="font-size:12px">Transaction ID (Optional)</label><input type="text" id="txId" placeholder="Enter transaction ID" class="input-field"></div>
 <button class="btn-paid" id="btnPaid" onclick="submitPayment()">✅ I DONE PAYMENT</button>
 <p id="payMsg" style="text-align:center;margin-top:8px;font-size:11px;min-height:14px"></p>
 </div>
@@ -157,7 +152,6 @@ footer{padding:24px 5%;text-align:center;border-top:1px solid var(--border);colo
 </div>
 </div>
 
-<!-- NEW JOINING POPUP -->
 <div class="join-popup" id="joinPopup">
 <div class="dot"></div>
 <div>
@@ -172,32 +166,22 @@ footer{padding:24px 5%;text-align:center;border-top:1px solid var(--border);colo
 <script>
 let siteData=null;let selectedPkg=null;let selectedBroker=null;let selectedWallet=null;
 async function load(){try{let r=await fetch('/api/data');siteData=await r.json();renderPkgs();}catch(e){document.getElementById('pkgGrid').innerHTML='Error: '+e.message;}}
-function renderPkgs(){let g=document.getElementById('pkgGrid');let h='';(siteData.packages||[]).forEach((p,i)=>{let pop=i===1?'popular':'';let badge=i===1?'<div class="pkg-badge">MOST POPULAR</div>':'';h+='<div class="pkg-card '+pop+'">'+badge+'<div class="pkg-size">'+(p.size||'')+'</div><div class="pkg-price">'+(p.price||'')+'</div><ul class="pkg-features">'+(p.features||[]).map(f=>'<li>'+f+'</li>').join('')+'</ul><button class="btn-buy" onclick="openPay('+i+')">Buy Now →</button></div>';});g.innerHTML=h||'<p style="color:#8892a6;text-align:center">No packages yet</p>';}
+function renderPkgs(){let g=document.getElementById('pkgGrid');let h='';(siteData.packages||[]).forEach((p,i)=>{let pop=i===1?'popular':'';let badge=i===1?'<div class="pkg-badge">MOST POPULAR</div>':'';h+='<div class="pkg-card '+pop+'">'+badge+'<div class="pkg-size">'+(p.size||'')+'</div><div class="pkg-price">'+(p.price||'')+'</div><ul class="pkg-features">'+(p.features||[]).map(f=>'<li>'+f+'</li>').join('')+'</ul><button class="btn-buy" onclick="openPay('+i+')">Buy Now →</button></div>';});g.innerHTML=h||'<p style="color:#8892a6;text-align:center">No packages available</p>';}
 function openPay(i){selectedPkg=siteData.packages[i];document.getElementById('payPkgName').innerText=selectedPkg.name+' - '+selectedPkg.size+' - '+selectedPkg.price;document.getElementById('step1').style.display='block';document.getElementById('step2').style.display='none';document.getElementById('step3').style.display='none';renderBrokers();document.getElementById('payModal').classList.add('active');}
 function closePay(){document.getElementById('payModal').classList.remove('active');}
 function goBack(s){if(s===1){document.getElementById('step1').style.display='block';document.getElementById('step2').style.display='none';document.getElementById('step3').style.display='none';}else if(s===2){document.getElementById('step2').style.display='block';document.getElementById('step3').style.display='none';}}
-function renderBrokers(){let h='';(siteData.brokers||[]).forEach((b,i)=>{h+='<button class="broker-btn" onclick="selectBroker('+i+')"><span>🔹 '+b.name+'</span><span>→</span></button>';});if(!h) h='<p style="color:#8892a6;font-size:12px">No brokers - admin se add karo</p>';document.getElementById('brokerList').innerHTML=h;}
+function renderBrokers(){let h='';(siteData.brokers||[]).forEach((b,i)=>{h+='<button class="broker-btn" onclick="selectBroker('+i+')"><span>🔹 '+b.name+'</span><span>→</span></button>';});if(!h) h='<p style="color:#8892a6;font-size:12px">No brokers available - Please add from admin panel</p>';document.getElementById('brokerList').innerHTML=h;}
 function selectBroker(i){selectedBroker=siteData.brokers[i];document.getElementById('selBrokerName').innerText=selectedBroker.name;document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='block';document.getElementById('step3').style.display='none';renderMethods();}
-function renderMethods(){let h='';(siteData.wallets||[]).forEach((w,i)=>{let label=w.network||'Wallet '+(i+1);let icon='💰';if(label.toLowerCase().includes('trc')) icon='🟢';else if(label.toLowerCase().includes('bep')||label.toLowerCase().includes('bsc')) icon='🟡';else if(label.toLowerCase().includes('btc')||label.toLowerCase().includes('bitcoin')) icon='🟠';else if(label.toLowerCase().includes('erc')) icon='🔵';h+='<button class="pay-method-btn" onclick="selectMethod('+i+')">'+icon+' '+label+'</button>';});if(!h) h='<p style="color:#8892a6;font-size:12px">No payment methods - admin se USDT TRC20, BEP20, BTC add karo</p>';document.getElementById('methodList').innerHTML=h;}
+function renderMethods(){let h='';(siteData.wallets||[]).forEach((w,i)=>{let label=w.network||'Wallet '+(i+1);let icon='💰';if(label.toLowerCase().includes('trc')) icon='🟢';else if(label.toLowerCase().includes('bep')||label.toLowerCase().includes('bsc')) icon='🟡';else if(label.toLowerCase().includes('btc')||label.toLowerCase().includes('bitcoin')) icon='🟠';else if(label.toLowerCase().includes('erc')) icon='🔵';h+='<button class="pay-method-btn" onclick="selectMethod('+i+')">'+icon+' '+label+'</button>';});if(!h) h='<p style="color:#8892a6;font-size:12px">No payment methods available - Please add USDT TRC20, BEP20, BTC from admin panel</p>';document.getElementById('methodList').innerHTML=h;}
 function selectMethod(i){selectedWallet=siteData.wallets[i];document.getElementById('selMethodName').innerText=selectedWallet.network;document.getElementById('step2').style.display='none';document.getElementById('step3').style.display='block';renderWalletDetail();}
-function renderWalletDetail(){let w=selectedWallet;let h='<div class="wallet-box"><div style="font-weight:700;color:var(--accent);font-size:14px;margin-bottom:6px">'+w.network+'</div>'+(w.qrImage?'<img class="qr-img" src="'+w.qrImage+'">':'<p style="color:var(--muted);font-size:12px">No QR</p>')+'<div class="addr">'+(w.address||'')+'</div><button class="copy-btn" onclick="copyAddr(\''+(w.address||'')+'\')">Copy Address</button><p style="font-size:10px;color:var(--muted);margin-top:8px">Send only '+(w.network||'')+' to this address</p></div>';document.getElementById('walletDetail').innerHTML=h;}
-function copyAddr(a){navigator.clipboard.writeText(a);alert('Copied!');}
-document.getElementById('ssFile').addEventListener('change',function(){let f=this.files[0];if(!f)return;if(f.size>5242880){alert('5MB se kam');return;}let r=new FileReader();r.onload=e=>{document.getElementById('ssBase64').value=e.target.result;let img=document.getElementById('ssPreview');img.src=e.target.result;img.style.display='block';document.getElementById('uploadText').innerHTML='✅ Screenshot Loaded';};r.readAsDataURL(f);});
-async function submitPayment(){let n=document.getElementById('custName').value.trim();let e=document.getElementById('custEmail').value.trim();let s=document.getElementById('ssBase64').value;let t=document.getElementById('txId').value.trim();let m=document.getElementById('payMsg');let b=document.getElementById('btnPaid');if(!n||!e){m.style.color='#ff6666';m.innerText='Name & Email required';return;}if(!s){m.style.color='#ff6666';m.innerText='Screenshot upload karo';return;}b.disabled=true;b.innerText='Submitting...';try{let res=await fetch('/api/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({package:selectedPkg,broker:selectedBroker,wallet:selectedWallet,customerName:n,customerEmail:e,txId:t,screenshot:s})});let d=await res.json();if(!res.ok) throw new Error(d.error);m.style.color='#00e5a0';m.innerText='✅ I DONE PAYMENT - Submitted! 30 min me verify hoga';b.innerText='✅ DONE';setTimeout(()=>{closePay();b.disabled=false;b.innerText='✅ I DONE PAYMENT';},2500);}catch(err){m.style.color='#ff6666';m.innerText='Error: '+err.message;b.disabled=false;b.innerText='✅ I DONE PAYMENT';}}
+function renderWalletDetail(){let w=selectedWallet;let h='<div class="wallet-box"><div style="font-weight:700;color:var(--accent);font-size:14px;margin-bottom:6px">'+w.network+'</div>'+(w.qrImage?'<img class="qr-img" src="'+w.qrImage+'">':'<p style="color:var(--muted);font-size:12px">No QR code available</p>')+'<div class="addr">'+(w.address||'')+'</div><button class="copy-btn" onclick="copyAddr(\''+(w.address||'')+'\')">Copy Address</button><p style="font-size:10px;color:var(--muted);margin-top:8px">Send only '+(w.network||'')+' to this address</p></div>';document.getElementById('walletDetail').innerHTML=h;}
+function copyAddr(a){navigator.clipboard.writeText(a);alert('Address copied to clipboard!');}
+document.getElementById('ssFile').addEventListener('change',function(){let f=this.files[0];if(!f)return;if(f.size>5242880){alert('File size must be less than 5MB');return;}let r=new FileReader();r.onload=e=>{document.getElementById('ssBase64').value=e.target.result;let img=document.getElementById('ssPreview');img.src=e.target.result;img.style.display='block';document.getElementById('uploadText').innerHTML='✅ Screenshot loaded successfully';};r.readAsDataURL(f);});
+async function submitPayment(){let n=document.getElementById('custName').value.trim();let e=document.getElementById('custEmail').value.trim();let s=document.getElementById('ssBase64').value;let t=document.getElementById('txId').value.trim();let m=document.getElementById('payMsg');let b=document.getElementById('btnPaid');if(!n||!e){m.style.color='#ff6666';m.innerText='Full name and email address are required';return;}if(!s){m.style.color='#ff6666';m.innerText='Please upload payment screenshot';return;}b.disabled=true;b.innerText='Submitting...';try{let res=await fetch('/api/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({package:selectedPkg,broker:selectedBroker,wallet:selectedWallet,customerName:n,customerEmail:e,txId:t,screenshot:s})});let d=await res.json();if(!res.ok) throw new Error(d.error);m.style.color='#00e5a0';m.innerText='Payment proof submitted successfully! Verification within 30 minutes.';b.innerText='✅ Submitted';setTimeout(()=>{closePay();b.disabled=false;b.innerText='✅ I DONE PAYMENT';},2500);}catch(err){m.style.color='#ff6666';m.innerText='Error: '+err.message;b.disabled=false;b.innerText='✅ I DONE PAYMENT';}}
 load();
-
-// NEW JOINING POPUP LOGIC
-const joins=[{name:"Ahmed from Dubai",action:"just joined $25k Challenge"},{name:"Sarah from UK",action:"just got funded $50k"},{name:"Fahad from Pakistan",action:"just joined $10k Challenge"},{name:"Mike from USA",action:"just received payout $1,200"},{name:"Ali from Saudi",action:"just joined $100k Challenge"},{name:"John from Canada",action:"just got funded $25k"}];
+const joins=[{name:"Ahmed from Dubai",action:"just joined $25k Challenge"},{name:"Sarah from UK",action:"just got funded $50k"},{name:"Fahad from Pakistan",action:"just joined $10k Challenge"},{name:"Mike from USA",action:"just received payout $1,200"},{name:"Ali from Saudi Arabia",action:"just joined $100k Challenge"},{name:"John from Canada",action:"just got funded $25k"}];
 let joinIdx=0;
-function showJoin(){
-  let j=joins[joinIdx%joins.length];
-  document.getElementById('joinName').innerText=j.name;
-  document.getElementById('joinAction').innerText=j.action;
-  let popup=document.getElementById('joinPopup');
-  popup.classList.add('show');
-  setTimeout(()=>{popup.classList.remove('show');},4000);
-  joinIdx++;
-}
+function showJoin(){let j=joins[joinIdx%joins.length];document.getElementById('joinName').innerText=j.name;document.getElementById('joinAction').innerText=j.action;let p=document.getElementById('joinPopup');p.classList.add('show');setTimeout(()=>{p.classList.remove('show');},4000);joinIdx++;}
 setTimeout(showJoin,3000);
 setInterval(showJoin,8000);
 </script>
