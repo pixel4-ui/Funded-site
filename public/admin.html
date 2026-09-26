@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin</title>
+<style>
+body{background:#05070d;color:#fff;font-family:Arial;padding:20px;max-width:700px;margin:auto}
+input{width:100%;padding:12px;margin:8px 0;background:#0d1220;border:1px solid #1c2333;color:#fff;border-radius:8px}
+button{padding:12px 18px;background:#00e5a0;color:#000;border:none;border-radius:8px;font-weight:800;cursor:pointer;margin:5px}
+.box{background:#0d1220;padding:15px;border-radius:10px;margin:15px 0;border:1px solid #1c2333}
+img{width:120px;height:120px;background:#fff;border-radius:8px;margin:10px 0;display:block}
+</style>
+</head>
+<body>
+<h2 style="color:#00e5a0;text-align:center">ADMIN - QR UPLOAD</h2>
+
+<div id="login">
+<input type="password" id="pwd" value="Admin7610">
+<button id="btnLogin">LOGIN</button>
+<div id="msg">Ready</div>
+</div>
+
+<div id="main" style="display:none">
+<div class="box">
+<h4>Wallets</h4>
+<div id="walletsList"></div>
+<button id="btnAddW">Add Wallet</button>
+<button id="btnSaveW">Save Wallets</button>
+</div>
+
+<div class="box">
+<h4>Brokers (Exness)</h4>
+<div id="brokersList"></div>
+<button id="btnAddB">Add Exness</button>
+<button id="btnSaveB">Save Brokers</button>
+</div>
+
+<a href="/" style="color:#00e5a0">View Site</a>
+</div>
+
+<script>
+let pass = "";
+let data = null;
+
+document.getElementById("btnLogin").onclick = async function() {
+  let p = document.getElementById("pwd").value;
+  document.getElementById("msg").innerText = "Checking...";
+  try {
+    let r = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({password:p})
+    });
+    let j = await r.json();
+    if(!r.ok) throw new Error(j.error);
+    pass = p;
+    localStorage.setItem("adminPass", p);
+    document.getElementById("login").style.display = "none";
+    document.getElementById("main").style.display = "block";
+    let r2 = await fetch("/api/data");
+    data = await r2.json();
+    showWallets();
+    showBrokers();
+  } catch(e) {
+    document.getElementById("msg").innerText = e.message;
+  }
+};
+
+function showWallets() {
+  let html = "";
+  for(let i=0;i<(data.wallets||[]).length;i++){
+    let w = data.wallets[i];
+    html += '<div class="box"><input id="w-net-'+i+'" value="'+(w.network||'')+'"><input id="w-addr-'+i+'" value="'+(w.address||'')+'">';
+    if(w.qrImage) html += '<img src="'+w.qrImage+'">';
+    html += '<input type="file" onchange="uploadQR('+i+',this)"><input type="hidden" id="w-qr-'+i+'" value=""></div>';
+  }
+  document.getElementById("walletsList").innerHTML = html;
+  setTimeout(function(){
+    for(let i=0;i<(data.wallets||[]).length;i++){
+      let el = document.getElementById("w-qr-"+i);
+      if(el) el.value = data.wallets[i].qrImage || "";
+    }
+  },100);
+}
+
+window.uploadQR = function(i, input){
+  let file = input.files[0];
+  if(!file) return;
+  let reader = new FileReader();
+  reader.onload = function(e){
+    document.getElementById("w-qr-"+i).value = e.target.result;
+    alert("QR Loaded! Save dabao");
+  };
+  reader.readAsDataURL(file);
+};
+
+document.getElementById("btnAddW").onclick = function(){
+  data.wallets.push({network:"USDT TRC20 (Exness)", address:"", qrImage:null});
+  showWallets();
+};
+
+document.getElementById("btnSaveW").onclick = async function(){
+  let arr = [];
+  for(let i=0;i<data.wallets.length;i++){
+    let net = document.getElementById("w-net-"+i).value;
+    let addr = document.getElementById("w-addr-"+i).value;
+    let qr = document.getElementById("w-qr-"+i).value || data.wallets[i].qrImage || null;
+    arr.push({network:net, address:addr, qrImage:qr});
+  }
+  let r = await fetch("/api/admin/save", {
+    method:"POST",
+    headers:{"Content-Type":"application/json","x-admin-password":pass},
+    body: JSON.stringify({section:"wallets", value:arr})
+  });
+  let j = await r.json();
+  if(!r.ok) alert(j.error);
+  else { alert("Saved"); data.wallets = arr; }
+};
+
+function showBrokers(){
+  let html = "";
+  for(let i=0;i<(data.brokers||[]).length;i++){
+    html += '<div><input id="b-'+i+'" value="'+data.brokers[i].name+'"></div>';
+  }
+  document.getElementById("brokersList").innerHTML = html;
+}
+
+document.getElementById("btnAddB").onclick = function(){
+  data.brokers.unshift({name:"Exness"});
+  showBrokers();
+};
+
+document.getElementById("btnSaveB").onclick = async function(){
+  let arr = [];
+  for(let i=0;i<data.brokers.length;i++){
+    arr.push({name: document.getElementById("b-"+i).value});
+  }
+  let r = await fetch("/api/admin/save", {
+    method:"POST",
+    headers:{"Content-Type":"application/json","x-admin-password":pass},
+    body: JSON.stringify({section:"brokers", value:arr})
+  });
+  let j = await r.json();
+  if(!r.ok) alert(j.error);
+  else alert("Brokers Saved");
+};
+</script>
+</body>
+</html>
