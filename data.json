@@ -29,7 +29,7 @@
   ],
   "brokers": [
     { "name": "Quotex" }, { "name": "Pocket Option" }, { "name": "IQ Option" },
-    { "name": "Olymp Trade" }, { "name": "Binomo" }, { "name": "Deriv" }
+    { "name": "Olymp Trade" }, { "name": "Binomo" }, { "name": "Exness" }
   ],
   "wallets": [
     { "network": "USDT (TRC20)", "address": "YOUR_TRC20_ADDRESS_HERE", "qrImage": null },
