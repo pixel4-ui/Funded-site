@@ -10,7 +10,20 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 function hashPassword(pw, salt) { return crypto.pbkdf2Sync(pw, salt, 100000, 64, 'sha512').toString('hex'); }
 let collection, ordersCollection;
-function getDefaultSeed() { try { return JSON.parse(fs.readFileSync(path.join(__dirname, 'data.json'), 'utf8')); } catch(e){ return { siteName:"MTFundedTrader", brokers:[{name:"Exness"}], wallets:[], packages:[] }; } }
+function getDefaultSeed() { 
+  try { 
+    const d = JSON.parse(fs.readFileSync(path.join(__dirname, 'data.json'), 'utf8')); 
+    // Add default settings if missing
+    if(!d.siteSettings) d.siteSettings = { primaryColor:"#00ff88", secondaryColor:"#0a0a0a", backgroundColor:"#000000", textColor:"#ffffff", buttonText:"Get Funded Now" };
+    return d;
+  } catch(e){ 
+    return { 
+      siteName:"MTFundedTrader", 
+      siteSettings: { primaryColor:"#00ff88", secondaryColor:"#0a0a0a", backgroundColor:"#000000", textColor:"#ffffff", buttonText:"Get Funded Now" },
+      brokers:[{name:"Exness"}], wallets:[], packages:[] 
+    }; 
+  } 
+}
 async function getData() { return await collection.findOne({ _id: 'site' }); }
 async function saveField(s, v) { await collection.updateOne({ _id: 'site' }, { $set: { [s]: v } }); }
 function requireAuth(handler) {
@@ -25,7 +38,13 @@ function requireAuth(handler) {
     } catch(err){ res.status(500).json({ error: 'Server error' }); }
   };
 }
-app.get('/api/data', async (req, res) => { try { const doc = await getData(); const { admin, _id,...publicData } = doc; res.json(publicData); } catch(e){ res.status(500).json({ error: 'Failed' }); } });
+app.get('/api/data', async (req, res) => { 
+  try { 
+    const doc = await getData(); 
+    const { admin, _id,...publicData } = doc; 
+    res.json(publicData); 
+  } catch(e){ res.status(500).json({ error: 'Failed' }); } 
+});
 app.post('/api/admin/login', async (req, res) => { try { const { password } = req.body; const data = await getData(); const hash = hashPassword(password, data.admin.salt); if (hash === data.admin.passwordHash) return res.json({ ok: true }); res.status(401).json({ error: 'Ghalat password' }); } catch(e){ res.status(500).json({ error: 'Server error' }); } });
 app.post('/api/admin/save', requireAuth(async (req, res) => { await saveField(req.body.section, req.body.value); res.json({ ok: true }); }));
 app.get('/api/admin/orders', requireAuth(async (req,res)=>{ try{ const orders = await ordersCollection.find({}).sort({createdAt:-1}).limit(100).toArray(); res.json(orders); }catch(e){ res.status(500).json({error:'Failed'}); } }));
@@ -53,6 +72,11 @@ async function start() {
     seed.admin = { salt, passwordHash: hashPassword('Admin7610', salt) };
     seed._id = 'site';
     await collection.insertOne(seed);
+  } else {
+    // Migration: Add siteSettings if not exists - site same rahegi
+    if(!existing.siteSettings){
+      await collection.updateOne({_id:'site'}, {$set:{siteSettings:{ primaryColor:"#00ff88", secondaryColor:"#111111", backgroundColor:"#000000", textColor:"#ffffff", buttonText:"Get Funded Now"}}});
+    }
   }
   app.listen(PORT, () => console.log('Server running ' + PORT));
 }
