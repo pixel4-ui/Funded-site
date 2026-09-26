@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FundedPro - Get Funded Today</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --bg:#05070d; --card:#0d1220; --card2:#0a0e18; --accent:#00e5a0; --accent2:#3b82f6;
+    --text:#e8ecf3; --muted:#8892a6; --border:#1c2333;
+  }
+  :root[data-theme="light"]{ --bg:#f4f6fb; --card:#ffffff; --card2:#eef1f8; --text:#0d1220; --muted:#5b6478; --border:#e1e5ee; }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px); scroll-behavior:smooth;}
+  body{background:var(--bg); color:var(--text); font-family:'Segoe UI',Arial,sans-serif; transition:background .3s,color .3s;
+    padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);}
+  a{text-decoration:none; color:inherit;} img{max-width:100%;}
+
+  nav.mainnav{display:flex; justify-content:space-between; align-items:center; padding:14px 6%; border-bottom:1px solid var(--border); gap:10px; position:sticky; top:0; background:rgba(5,7,13,0.97); backdrop-filter:blur(10px); z-index:60;}
+  :root[data-theme="light"] nav.mainnav{background:rgba(244,246,251,0.97);}
+  .logo{font-weight:800; font-size:18px;} .logo span{color:var(--accent);}
+  .navlinks{display:none;} @media(min-width:700px){ .navlinks{display:flex; gap:22px; font-size:13px; color:var(--muted);} }
+  .theme-toggle{background:var(--card); border:1px solid var(--border); width:38px; height:38px; border-radius:10px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; color:var(--text); flex-shrink:0;}
+
+  .ticker-wrap{overflow:hidden; background:var(--card); border-bottom:1px solid var(--border); padding:10px 0;}
+  .ticker-track{display:flex; gap:50px; white-space:nowrap; animation:tickerScroll 22s linear infinite; width:max-content;}
+  .ticker-track span{font-size:12px; color:var(--muted); font-weight:600;} .ticker-track span b{color:var(--accent);}
+  @keyframes tickerScroll{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+
+  .hero{padding:44px 6% 36px; text-align:center;}
+  .badge{display:inline-block; background:rgba(0,229,160,0.1); border:1px solid rgba(0,229,160,0.3); color:var(--accent); padding:6px 14px; border-radius:20px; font-size:11px; font-weight:700; margin-bottom:18px;}
+  .hero h1{font-size:clamp(26px,6vw,44px); font-weight:800; line-height:1.2; max-width:700px; margin:0 auto;}
+  .hero h1 .grad{background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .hero p{color:var(--muted); max-width:480px; margin:16px auto 26px; font-size:14px;}
+  .hero-cta{display:flex; gap:12px; justify-content:center; flex-wrap:wrap;}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#000; font-weight:700; padding:13px 26px; border-radius:10px; font-size:14px; border:none; cursor:pointer;}
+  .btn-outline{border:1px solid var(--border); padding:13px 26px; border-radius:10px; font-size:14px; color:var(--text);}
+
+  .shape3d{width:170px; height:170px; margin:26px auto 0; perspective:900px;}
+  .cube{width:100%; height:100%; position:relative; transform-style:preserve-3d; animation:spin 14s linear infinite;}
+  .face{position:absolute; width:170px; height:170px; border:1px solid rgba(0,229,160,0.35); background:linear-gradient(135deg, rgba(0,229,160,0.08), rgba(59,130,246,0.08));}
+  .f1{transform:translateZ(85px);} .f2{transform:rotateY(90deg) translateZ(85px);} .f3{transform:rotateY(180deg) translateZ(85px);}
+  .f4{transform:rotateY(-90deg) translateZ(85px);} .f5{transform:rotateX(90deg) translateZ(85px);} .f6{transform:rotateX(-90deg) translateZ(85px);}
+  @keyframes spin{from{transform:rotateX(0) rotateY(0);} to{transform:rotateX(360deg) rotateY(360deg);}}
+
+  .stats{display:flex; gap:0; justify-content:center; flex-wrap:wrap; max-width:700px; margin:32px auto 0; border-top:1px solid var(--border); padding-top:24px;}
+  .stat{flex:1; min-width:130px; text-align:center; padding:6px;} .stat h3{font-size:22px; color:var(--accent); font-weight:800;} .stat span{color:var(--muted); font-size:11px;}
+
+  section{padding:50px 6%;}
+  .section-title{text-align:center; font-size:clamp(22px,4vw,30px); font-weight:800; margin-bottom:8px;}
+  .section-sub{text-align:center; color:var(--muted); max-width:520px; margin:0 auto 36px; font-size:14px;}
+
+  .benefits{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; max-width:1000px; margin:0 auto;}
+  .benefit-card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px;}
+  .benefit-card .icon{width:40px; height:40px; border-radius:10px; background:rgba(0,229,160,0.12); display:flex; align-items:center; justify-content:center; font-size:19px; margin-bottom:12px;}
+  .benefit-card h4{font-size:14px; margin-bottom:6px;} .benefit-card p{color:var(--muted); font-size:12px; line-height:1.5;}
+
+  .steps{display:flex; gap:16px; flex-wrap:wrap; justify-content:center; max-width:1000px; margin:0 auto;}
+  .step{flex:1; min-width:180px; text-align:center; padding:16px;}
+  .step .num{width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#000; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:14px;}
+  .step h4{font-size:13px; margin-bottom:6px;} .step p{color:var(--muted); font-size:12px;}
+
+  .packages{display:flex; gap:18px; flex-wrap:wrap; justify-content:center; max-width:900px; margin:0 auto;}
+  .pkg-card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:24px; width:260px; position:relative;}
+  .pkg-card.popular{border-color:var(--accent);}
+  .pkg-card .tag{position:absolute; top:-10px; right:16px; background:var(--accent); color:#000; font-size:10px; font-weight:800; padding:4px 10px; border-radius:6px;}
+  .pkg-card h3{font-size:17px; margin-bottom:6px;} .pkg-card .size{color:var(--accent); font-weight:700; font-size:12px; margin-bottom:12px;}
+  .pkg-card .price{font-size:26px; font-weight:800;} .pkg-card .split{color:var(--muted); font-size:12px; margin-bottom:14px;}
+  .pkg-card ul{list-style:none; margin-bottom:18px;} .pkg-card li{color:var(--muted); font-size:12px; padding:4px 0; padding-left:18px; position:relative;}
+  .pkg-card li:before{content:"✓"; color:var(--accent); position:absolute; left:0;}
+  .buy-btn{display:block; width:100%; text-align:center; padding:12px; border-radius:10px; font-weight:700; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#000; border:none; cursor:pointer; font-size:13px;}
+
+  .testimonials{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px; max-width:1000px; margin:0 auto;}
+  .t-card{background:linear-gradient(160deg, var(--card), var(--card2)); border:1px solid var(--border); border-radius:16px; padding:20px; transition:transform .3s, box-shadow .3s;}
+  .t-card:hover{transform:translateY(-6px) rotateX(3deg); box-shadow:0 16px 32px rgba(0,229,160,0.1); border-color:var(--accent);}
+  .t-card .stars{color:#facc15; font-size:12px; margin-bottom:8px;} .t-card p{color:var(--muted); font-size:13px; line-height:1.6; margin-bottom:14px; font-style:italic;}
+  .t-who{display:flex; align-items:center; gap:10px;}
+  .t-avatar{width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-weight:800; color:#000; font-size:12px; flex-shrink:0;}
+  .t-card .who{font-size:12px; font-weight:700;} .t-card .role{font-size:11px; color:var(--muted);}
+
+  .faq-item{max-width:700px; margin:0 auto 10px; background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden;}
+  .faq-q{padding:15px 16px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:600;}
+  .faq-a{padding:0 16px; max-height:0; overflow:hidden; transition:all .25s; color:var(--muted); font-size:13px;}
+  .faq-item.open .faq-a{padding:0 16px 15px; max-height:200px;}
+
+  footer{text-align:center; padding:26px; color:var(--muted); font-size:12px; border-top:1px solid var(--border);}
+
+  .modal-bg{display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200; align-items:center; justify-content:center; padding:20px;}
+  .modal-bg.show{display:flex;}
+  .modal{background:var(--card); border:1px solid var(--border); border-radius:18px; padding:26px; max-width:380px; width:100%; max-height:90vh; overflow-y:auto;}
+  .modal h3{font-size:17px; margin-bottom:4px;} .modal .sub{color:var(--muted); font-size:12px; margin-bottom:16px;}
+  .qr-box{background:#fff; border-radius:12px; padding:14px; display:flex; align-items:center; justify-content:center; margin-bottom:14px;}
+  .pay-row{display:flex; justify-content:space-between; font-size:13px; padding:8px 0; border-bottom:1px solid var(--border);} .pay-row span:first-child{color:var(--muted);}
+  .addr-box{background:#000; padding:12px; border-radius:8px; font-family:monospace; word-break:break-all; font-size:12px; color:var(--accent); margin:12px 0;}
+  .copy-btn{width:100%; background:var(--border); color:var(--text); border:none; padding:11px; border-radius:8px; cursor:pointer; font-size:13px; margin-bottom:8px;}
+  .close-btn{width:100%; background:transparent; border:1px solid var(--border); color:var(--muted); padding:11px; border-radius:8px; cursor:pointer; font-size:13px;}
+
+  .broker-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:16px 0;}
+  .broker-card{background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:16px 10px; text-align:center; cursor:pointer; transition:border-color .2s;}
+  .broker-card:hover, .broker-card:active{border-color:var(--accent);}
+  .broker-icon{width:42px; height:42px; border-radius:10px; color:#fff; font-weight:800; font-size:15px; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; letter-spacing:0.5px;}
+  .broker-card .bname{font-size:12px; font-weight:700;}
+
+  .network-list{display:flex; flex-direction:column; gap:10px; margin:16px 0;}
+  .network-item{background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:14px 16px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition:border-color .2s;}
+  .network-item:hover, .network-item:active{border-color:var(--accent);}
+  .network-item .nname{font-size:13px; font-weight:700;}
+  .network-item .arrow{color:var(--accent);}
+
+  .join-toast{position:fixed; left:16px; bottom:16px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:10px; box-shadow:0 10px 30px rgba(0,0,0,0.4); max-width:260px; z-index:150; transform:translateY(120%); opacity:0; transition:all .4s ease; font-size:12px;}
+  .join-toast.show{transform:translateY(0); opacity:1;}
+  .join-toast .dot{width:8px; height:8px; border-radius:50%; background:var(--accent); flex-shrink:0; box-shadow:0 0 0 0 rgba(0,229,160,0.6); animation:pulse 1.6s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,229,160,0.5);} 70%{box-shadow:0 0 0 8px rgba(0,229,160,0);} 100%{box-shadow:0 0 0 0 rgba(0,229,160,0);}}
+  .join-toast b{color:var(--text);} .join-toast .jt-sub{color:var(--muted); font-size:11px; display:block; margin-top:2px;}
+</style>
+</head>
+<body>
+
+<nav class="mainnav">
+  <div class="logo" id="siteLogo">FUNDED<span>PRO</span></div>
+  <div class="navlinks"><a href="#benefits">Why Us</a><a href="#packages">Packages</a><a href="#faq">FAQ</a></div>
+  <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">🌙</button>
+</nav>
+
+<div class="ticker-wrap"><div class="ticker-track" id="tickerTrack"></div></div>
+
+<div class="hero">
+  <div class="badge" id="heroBadge"></div>
+  <h1 id="heroTitle"></h1>
+  <p id="heroSubtitle"></p>
+  <div class="hero-cta">
+    <a href="#packages" class="btn-primary">Get Funded Now</a>
+    <a href="#howitworks" class="btn-outline">How It Works</a>
+  </div>
+  <div class="shape3d"><div class="cube">
+    <div class="face f1"></div><div class="face f2"></div><div class="face f3"></div>
+    <div class="face f4"></div><div class="face f5"></div><div class="face f6"></div>
+  </div></div>
+  <div class="stats" id="statsContainer"></div>
+</div>
+
+<section id="benefits">
+  <h2 class="section-title">Why Choose Us</h2>
+  <p class="section-sub">Trade with our capital, risk-free, and keep the majority of your profits.</p>
+  <div class="benefits" id="benefitsContainer"></div>
+</section>
+
+<section id="howitworks">
+  <h2 class="section-title">How It Works</h2>
+  <div class="steps" id="stepsContainer"></div>
+</section>
+
+<section id="packages">
+  <h2 class="section-title">Choose Your Package</h2>
+  <p class="section-sub">Every account comes with instant activation.</p>
+  <div class="packages" id="packagesContainer"></div>
+</section>
+
+<section>
+  <h2 class="section-title">What Our Traders Say</h2>
+  <p class="section-sub">Real experiences from our funded traders.</p>
+  <div class="testimonials" id="testimonialsContainer"></div>
+</section>
+
+<section id="faq">
+  <h2 class="section-title">FAQs</h2>
+  <div id="faqContainer"></div>
+</section>
+
+<footer id="siteFooter"></footer>
+
+<div class="modal-bg" id="payModal">
+  <div class="modal">
+    <div id="stepBroker">
+      <h3 id="modalPkgName">Package</h3>
+      <div class="sub">Step 1 — Choose your broker</div>
+      <div class="broker-grid" id="brokerGrid"></div>
+      <button class="close-btn" onclick="closeModal()">Cancel</button>
+    </div>
+    <div id="stepNetwork" style="display:none;">
+      <h3 id="brokerChosenLabel">Broker</h3>
+      <div class="sub">Step 2 — Choose payment network</div>
+      <div class="network-list" id="networkList"></div>
+      <button class="close-btn" onclick="backToBroker()">Back</button>
+    </div>
+    <div id="stepPay" style="display:none;">
+      <h3 id="modalPkgName2">Package</h3>
+      <div class="sub" id="modalPkgPrice">Scan the QR or copy the address to pay</div>
+      <div class="qr-box"><div id="qrcodeCanvas"></div></div>
+      <div class="pay-row"><span>Broker</span><span id="modalBroker">-</span></div>
+      <div class="pay-row"><span>Network</span><span id="modalNetwork">-</span></div>
+      <div class="pay-row"><span>Amount</span><span id="modalAmount">-</span></div>
+      <div class="addr-box" id="modalAddr">-</div>
+      <button class="copy-btn" onclick="copyModalAddr()">📋 Copy Address</button>
+      <button class="close-btn" onclick="backToNetwork()">Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="join-toast" id="joinToast">
+  <div class="dot"></div>
+  <div><b id="jtName">Someone</b> just joined<span class="jt-sub" id="jtSub">a few seconds ago</span></div>
+</div>
+
+<script>
+let data = null;
+
+async function loadData(){
+  try{
+    const res = await fetch('/api/data');
+    data = await res.json();
+    renderSite();
+  }catch(e){
+    document.getElementById('heroTitle').innerText = 'Site data load nahi ho saki. Server chal raha hai?';
+  }
+}
+
+function toggleTheme(){
+  const root = document.documentElement;
+  const isLight = root.getAttribute('data-theme') === 'light';
+  if(isLight){ root.removeAttribute('data-theme'); document.getElementById('themeBtn').innerText = '🌙'; try{localStorage.setItem('fundedTheme','dark');}catch(e){} }
+  else { root.setAttribute('data-theme','light'); document.getElementById('themeBtn').innerText = '☀️'; try{localStorage.setItem('fundedTheme','light');}catch(e){} }
+}
+(function initTheme(){
+  try{ if(localStorage.getItem('fundedTheme') === 'light'){ document.documentElement.setAttribute('data-theme','light'); document.addEventListener('DOMContentLoaded',()=>{document.getElementById('themeBtn').innerText='☀️';}); } }catch(e){}
+})();
+
+function renderSite(){
+  document.getElementById('siteLogo').innerText = data.siteName;
+  document.getElementById('heroBadge').innerText = data.hero.badge;
+  document.getElementById('heroTitle').innerHTML = data.hero.title + '<br><span class="grad">' + data.hero.accent + '</span>';
+  document.getElementById('heroSubtitle').innerText = data.hero.subtitle;
+  document.getElementById('siteFooter').innerText = data.footer;
+
+  document.getElementById('statsContainer').innerHTML = data.stats.map(s=>`<div class="stat"><h3>${s.number}</h3><span>${s.label}</span></div>`).join('');
+  document.getElementById('tickerTrack').innerHTML = Array(2).fill(data.stats.map(s=>`<span>🔥 <b>${s.number}</b> ${s.label}</span>`).join('')).join('');
+  document.getElementById('benefitsContainer').innerHTML = data.benefits.map(b=>`<div class="benefit-card"><div class="icon">${b.icon}</div><h4>${b.title}</h4><p>${b.desc}</p></div>`).join('');
+  document.getElementById('stepsContainer').innerHTML = data.steps.map((s,i)=>`<div class="step"><div class="num">${i+1}</div><h4>${s.title}</h4><p>${s.desc}</p></div>`).join('');
+  document.getElementById('packagesContainer').innerHTML = data.packages.map(p=>`
+    <div class="pkg-card ${p.popular?'popular':''}">
+      ${p.popular?'<div class="tag">POPULAR</div>':''}
+      <h3>${p.name}</h3><div class="size">${p.size} Account</div><div class="price">${p.price}</div>
+      <div class="split">Profit Split: ${p.profitSplit}</div>
+      <ul>${p.features.map(f=>`<li>${f}</li>`).join('')}</ul>
+      <button class="buy-btn" onclick='showPay(${JSON.stringify(p.name)}, ${JSON.stringify(p.price)})'>Buy Now</button>
+    </div>`).join('');
+  document.getElementById('testimonialsContainer').innerHTML = data.testimonials.map(t=>`
+    <div class="t-card"><div class="stars">★★★★★</div><p>"${t.text}"</p>
+      <div class="t-who"><div class="t-avatar">${t.initials}</div><div><div class="who">${t.name}</div><div class="role">${t.role}</div></div></div>
+    </div>`).join('');
+  document.getElementById('faqContainer').innerHTML = data.faq.map(f=>`
+    <div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">${f.q} <span>+</span></div><div class="faq-a">${f.a}</div></div>`).join('');
+}
+
+let currentPkg = null;
+let chosenBroker = null;
+
+function brokerColor(name){
+  const palette = ['#00e5a0','#3b82f6','#f97316','#a855f7','#ec4899','#eab308','#14b8a6','#ef4444'];
+  let hash = 0;
+  for(let i=0;i<name.length;i++){ hash = name.charCodeAt(i) + ((hash << 5) - hash); }
+  return palette[Math.abs(hash) % palette.length];
+}
+
+function showPay(name, price){
+  currentPkg = { name, price };
+  document.getElementById('modalPkgName').innerText = name;
+  document.getElementById('brokerGrid').innerHTML = data.brokers.map(b => `
+    <div class="broker-card" onclick='chooseBroker(${JSON.stringify(b.name)})'>
+      <div class="broker-icon" style="background:${brokerColor(b.name)}">${b.name.slice(0,2).toUpperCase()}</div>
+      <div class="bname">${b.name}</div>
+    </div>
+  `).join('');
+  document.getElementById('stepBroker').style.display = 'block';
+  document.getElementById('stepNetwork').style.display = 'none';
+  document.getElementById('stepPay').style.display = 'none';
+  document.getElementById('payModal').classList.add('show');
+}
+
+function chooseBroker(name){
+  chosenBroker = name;
+  document.getElementById('brokerChosenLabel').innerText = 'Broker: ' + name;
+  document.getElementById('networkList').innerHTML = data.wallets.map((w,i) => `
+    <div class="network-item" onclick="chooseNetwork(${i})">
+      <span class="nname">${w.network}</span><span class="arrow">→</span>
+    </div>
+  `).join('');
+  document.getElementById('stepBroker').style.display = 'none';
+  document.getElementById('stepNetwork').style.display = 'block';
+}
+
+function chooseNetwork(i){
+  const w = data.wallets[i];
+  document.getElementById('modalPkgName2').innerText = currentPkg.name;
+  document.getElementById('modalPkgPrice').innerText = 'Amount: ' + currentPkg.price;
+  document.getElementById('modalBroker').innerText = chosenBroker;
+  document.getElementById('modalNetwork').innerText = w.network;
+  document.getElementById('modalAmount').innerText = currentPkg.price;
+  document.getElementById('modalAddr').innerText = w.address;
+  document.getElementById('qrcodeCanvas').innerHTML = '';
+  if(w.qrImage){
+    const img = document.createElement('img'); img.src = w.qrImage; img.style.width='160px'; img.style.borderRadius='8px';
+    document.getElementById('qrcodeCanvas').appendChild(img);
+  } else {
+    try{ new QRCode(document.getElementById('qrcodeCanvas'), { text: w.address, width:160, height:160 }); }catch(e){}
+  }
+  document.getElementById('stepNetwork').style.display = 'none';
+  document.getElementById('stepPay').style.display = 'block';
+  window._currentWalletAddr = w.address;
+}
+
+function backToBroker(){ document.getElementById('stepNetwork').style.display='none'; document.getElementById('stepBroker').style.display='block'; }
+function backToNetwork(){ document.getElementById('stepPay').style.display='none'; document.getElementById('stepNetwork').style.display='block'; }
+function closeModal(){ document.getElementById('payModal').classList.remove('show'); }
+function copyModalAddr(){ navigator.clipboard.writeText(window._currentWalletAddr).then(()=>alert('Address copied!')); }
+
+const jNames = ["Ahmed","Bilal","Hamza","Usman","Sana","Ayesha","Hassan","Fatima","Zain","Noor"];
+const jCities = ["Lahore","Karachi","Islamabad","Faisalabad","Multan","Peshawar","Rawalpindi"];
+function showJoinToast(){
+  const name = jNames[Math.floor(Math.random()*jNames.length)];
+  const city = jCities[Math.floor(Math.random()*jCities.length)];
+  document.getElementById('jtName').innerText = name + ' from ' + city;
+  document.getElementById('jtSub').innerText = 'just joined FundedPro';
+  const toast = document.getElementById('joinToast');
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'), 4200);
+}
+function startJoinLoop(){ setTimeout(function loop(){ showJoinToast(); setTimeout(loop, 9000 + Math.random()*6000); }, 4000); }
+
+loadData();
+startJoinLoop();
+</script>
+</body>
+</html>
