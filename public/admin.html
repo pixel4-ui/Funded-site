@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Admin Login Fixed</title>
+<style>
+body{background:#05070d;color:#fff;font-family:Arial;padding:20px;max-width:600px;margin:auto}
+input{width:100%;padding:14px;margin:10px 0;background:#0d1220;border:1px solid #1c2333;color:#fff;border-radius:8px;font-size:16px}
+button{width:100%;padding:14px;background:#00e5a0;color:#000;border:none;border-radius:8px;font-weight:900;font-size:16px;cursor:pointer}
+button:disabled{opacity:0.5}
+#msg{margin-top:15px;padding:10px;background:#0d1220;border-radius:8px;min-height:20px;font-size:13px;word-break:break-all}
+.box{background:#0d1220;padding:15px;border-radius:10px;margin:15px 0;border:1px solid #1c2333}
+</style></head><body>
+<h2 style="color:#00e5a0;text-align:center">FUNDEDPRO ADMIN LOGIN - V3 FIXED</h2>
+<div id="loginBox">
+<input type="password" id="passInput" placeholder="Password: Admin7610" value="Admin7610">
+<button id="loginBtn">LOGIN KRO - CLICK HERE</button>
+<div id="msg">Ready... Button dabao</div>
+<p style="font-size:12px;color:#8892a6;text-align:center">Agar click nahi ho raha to <a href="#" id="clearLink" style="color:#00e5a0">yahan click karo - Clear Cache</a></p>
+</div>
+<div id="panel" style="display:none">
+<h3 style="color:#00e5a0">✅ Login Success! MongoDB Connected</h3>
+<div class="box"><h4>Wallets + QR Upload</h4><div id="wallets"></div><button id="addWalletBtn">+ Add Wallet (Exness)</button><button id="saveWalletBtn" style="background:#3b82f6;margin-top:10px">💾 Save Wallets</button></div>
+<div class="box"><h4>Brokers</h4><div id="brokers"></div><button id="addBrokerBtn">+ Add Exness</button><button id="saveBrokerBtn">Save Brokers</button></div>
+<button id="logoutBtn" style="background:transparent;border:1px solid #00e5a0;color:#00e5a0;margin-top:20px">Logout</button>
+<a href="/" style="display:block;text-align:center;margin-top:15px;color:#00e5a0">View Site</a>
+</div>
+<script>
+console.log('Admin V3 loaded');
+let adminPass = '';
+let siteData = null;
+
+document.getElementById('clearLink').addEventListener('click', function(e){
+  e.preventDefault();
+  localStorage.clear();
+  location.reload();
+});
+
+document.getElementById('loginBtn').addEventListener('click', async function(){
+  console.log('Login button clicked');
+  const passEl = document.getElementById('passInput');
+  const msgEl = document.getElementById('msg');
+  const btn = document.getElementById('loginBtn');
+  const pass = passEl.value.trim();
+  if(!pass){ msgEl.innerHTML='❌ Password likho'; return; }
+  btn.disabled = true; btn.innerHTML='Checking...'; msgEl.innerHTML='⏳ Login check ho raha hai... /api/admin/login call...';
+  try{
+    console.log('Calling /api/admin/login with', pass);
+    const res = await fetch('/api/admin/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({password:pass})});
+    const text = await res.text();
+    console.log('Raw response', text);
+    let data;
+    try{ data = JSON.parse(text); }catch(e){ throw new Error('Server error: '+text.substring(0,200)); }
+    msgEl.innerHTML = 'Response: '+res.status+' - '+JSON.stringify(data);
+    if(!res.ok) throw new Error(data.error||'Login failed');
+    adminPass = pass;
+    localStorage.setItem('adminPass', pass);
+    msgEl.innerHTML='✅ Login OK! Data load ho raha hai...';
+    document.getElementById('loginBox').style.display='none';
+    document.getElementById('panel').style.display='block';
+    await loadData();
+  }catch(err){
+    console.error(err);
+    msgEl.innerHTML='❌ ERROR: '+err.message+'<br><br>Check: 1) Render deploy complete hai? 2) Password Admin7610 sahi hai? 3) MongoDB connected hai? Logs dekho.';
+    btn.disabled=false; btn.innerHTML='LOGIN KRO - CLICK HERE';
+  }
+});
+
+async function loadData(){
+  const msgEl = document.getElementById('msg');
+  try{
+    const res = await fetch('/api/data');
+    if(!res.ok) throw new Error('Data load fail '+res.status);
+    siteData = await res.json();
+    console.log('Site data', siteData);
+    renderWallets();
+    renderBrokers();
+    msgEl.innerHTML='';
+  }catch(e){
+    console.error(e);
+    alert('Data load fail: '+e.message);
+  }
+}
+
+function renderWallets(){
+  let html='';
+  (siteData.wallets||[]).forEach((w,i)=>{
+    html+=`<div style="border:1px solid #1c2333;padding:10px;border-radius:8px;margin:8px 0;background:#05070d">
+      <input placeholder="Network" value="${w.network||''}" data-i="${i}" data-k="network" class="w-in">
+      <input placeholder="Address" value="${w.address||''}" data-i="${i}" data-k="address" class="w-in">
+      <div style="margin:8px 0">${w.qrImage? `<img src="${w.qrImage}" style="width:100px;height:100px;border-radius:8px;background:#fff">` : 'No QR'}</div>
+      <input type="file" accept="image/*" onchange="uploadQR(${i}, this)" style="margin:8px 0">
+      <input type="hidden" value="${(w.qrImage||'').substring(0,50)}" data-i="${i}" data-k="qrImage" class="w-in" id="qr-hidden-${i}">
+      <div style="font-size:10px;color:#8892a6;word-break:break-all">${w.qrImage? w.qrImage.substring(0,60)+'...' : ''}</div>
+    </div>`;
+  });
+  document.getElementById('wallets').innerHTML=html;
+  // restore full qr values
+  setTimeout(()=>{
+    (siteData.wallets||[]).forEach((w,i)=>{
+      let el=document.getElementById('qr-hidden-'+i);
+      if(el) el.value = w.qrImage||'';
+    });
+  },100);
+}
+
+window.uploadQR = function(idx, input){
+  const file=input.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const b64=e.target.result;
+    document.getElementById('qr-hidden-'+idx).value=b64;
+    alert('QR loaded! Ab Save Wallets dabao');
+    renderWallets();
+    // re-set value after render
+    setTimeout(()=>{ document.getElementById('qr-hidden-'+idx).value=b64; },200);
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderBrokers(){
+  let html='';
+  (siteData.brokers||[]).forEach((b,i)=>{
+    html+=`<div style="display:flex;gap:8px;margin:6px 0"><input value="${b.name}" data-i="${i}" class="b-in" style="flex:1"><button onclick="siteData.brokers.splice(${i},1); renderBrokers();" style="width:auto;padding:6px 10px">X</button></div>`;
+  });
+  document.getElementById('brokers').innerHTML=html;
+}
+
+document.getElementById('addWalletBtn').addEventListener('click', ()=>{
+  siteData.wallets.push({network:"USDT TRC20 (Exness)",address:"",qrImage:null});
+  renderWallets();
+});
+
+document.getElementById('saveWalletBtn').addEventListener('click', async ()=>{
+  let arr=[];
+  document.querySelectorAll('.w-in').forEach(el=>{
+    let i=el.dataset.i,k=el.dataset.k;
+    if(!arr[i]) arr[i]={};
+    arr[i][k]=el.value;
+    if(k==='qrImage' && (!el.value || el.value.length<10)){
+      if(siteData.wallets[i] && siteData.wallets[i].qrImage) arr[i][k]=siteData.wallets[i].qrImage;
+    }
+    if(!arr[i].qrImage) arr[i].qrImage=null;
+  });
+  try{
+    const res=await fetch('/api/admin/save',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':adminPass},body:JSON.stringify({section:'wallets',value:arr})});
+    const d=await res.json();
+    if(!res.ok) throw new Error(d.error);
+    alert('✅ Wallets Saved! QR Upload OK');
+    siteData.wallets=arr;
+    renderWallets();
+  }catch(e){ alert('Save fail: '+e.message); }
+});
+
+document.getElementById('addBrokerBtn').addEventListener('click', ()=>{
+  siteData.brokers.unshift({name:"Exness"});
+  renderBrokers();
+});
+
+document.getElementById('saveBrokerBtn').addEventListener('click', async ()=>{
+  let arr=[];
+  document.querySelectorAll('.b-in').forEach(el=>{ arr.push({name:el.value}); });
+  try{
+    const res=await fetch('/api/admin/save',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':adminPass},body:JSON.stringify({section:'brokers',value:arr})});
+    const d=await res.json();
+    if(!res.ok) throw new Error(d.error);
+    alert('✅ Brokers Saved! Exness added');
+  }catch(e){ alert('Save fail: '+e.message); }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', ()=>{ localStorage.clear
