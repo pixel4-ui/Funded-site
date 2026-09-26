@@ -1,0 +1,176 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Admin - FundedPro</title>
+<style>
+:root{ --bg:#05070d; --card:#0d1220; --accent:#00e5a0; --border:#1c2333; --text:#e8ecf3; --muted:#8892a6; }
+body{background:var(--bg);color:var(--text);font-family:sans-serif;padding:16px;max-width:1000px;margin:auto}
+input,textarea{width:100%;padding:11px;margin:6px 0;background:#0a0e18;border:1px solid var(--border);color:#fff;border-radius:8px}
+button{background:linear-gradient(135deg,var(--accent),#3b82f6);color:#000;padding:10px 18px;border:none;border-radius:8px;font-weight:800;cursor:pointer;margin:4px}
+.btn-outline{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.box{background:var(--card);padding:18px;border-radius:14px;margin:14px 0;border:1px solid var(--border)}
+.item{border:1px solid var(--border);padding:12px;border-radius:10px;margin:8px 0;background:rgba(0,0,0,0.2)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+h1{color:var(--accent)} h3{color:var(--accent);margin-bottom:10px}
+.qr-preview{width:100px;height:100px;border-radius:8px;border:1px solid var(--border);margin:8px 0;display:block;object-fit:cover}
+.upload-label{background:var(--bg);border:1px dashed var(--accent);padding:10px;border-radius:8px;display:block;text-align:center;cursor:pointer;color:var(--accent);font-size:12px;margin:6px 0}
+.upload-label:hover{background:rgba(0,229,160,0.1)}
+</style>
+</head><body>
+<h1>💎 FUNDEDPRO ADMIN - QR UPLOAD FIXED</h1>
+<div id="loginBox"><input type="password" id="pass" placeholder="Password default Admin7610"><button onclick="login()">LOGIN</button><p id="loginMsg" style="color:#f55"></p></div>
+<div id="panel" style="display:none">
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button onclick="load()">Reload</button><button class="btn-outline" onclick="logout()">Logout</button><a href="/" style="color:var(--accent);padding:10px;text-decoration:none">View Site</a></div>
+
+<div class="box"><h3>Site + Hero - Same Colour</h3>
+Site Name:<input id="siteName">Badge:<input id="heroBadge">Title:<input id="heroTitle">Accent:<input id="heroAccent">Subtitle:<textarea id="heroSub"></textarea>Footer:<input id="footer">
+<button onclick="saveHero()">Save All</button></div>
+
+<div class="box"><h3>Stats</h3><div id="statsEditor"></div><button onclick="addStat()">+ Add</button><button onclick="saveSection('stats', getStats())">Save Stats</button></div>
+
+<div class="box"><h3>Packages</h3><div id="packagesEditor"></div><button onclick="addPackage()">+ Add Package</button><button onclick="saveSection('packages', getPackages())">Save Packages</button></div>
+
+<div class="box"><h3>Brokers - Exness Added</h3><div id="brokersEditor"></div><button onclick="addBroker()">+ Add Broker</button><button onclick="saveSection('brokers', getBrokers())">Save Brokers</button></div>
+
+<div class="box"><h3>💳 Wallets - TRC20/BEP20/BTC + QR UPLOAD</h3>
+<p style="color:var(--muted);font-size:12px;margin-bottom:12px">Ab aap QR image direct upload kar sakte ho. Gallery se image select karo, auto save ho jayega.</p>
+<div id="walletsEditor"></div><button onclick="addWallet()">+ Add Wallet</button><button onclick="saveSection('wallets', getWallets())">Save Wallets</button></div>
+
+<div class="box"><h3>Testimonials</h3><div id="testimonialsEditor"></div><button onclick="addTestimonial()">+ Add</button><button onclick="saveSection('testimonials', getTestimonials())">Save</button></div>
+
+<div class="box"><h3>FAQ</h3><div id="faqEditor"></div><button onclick="addFaq()">+ Add FAQ</button><button onclick="saveSection('faq', getFaq())">Save FAQ</button></div>
+
+<div class="box"><h3>Change Password</h3><input type="password" id="newPass" placeholder="New password min 6"><button onclick="changePass()">Change</button></div>
+<p id="msg" style="color:var(--accent);font-weight:700"></p>
+</div>
+
+<script>
+let SITE_DATA=null,adminPass=localStorage.getItem('adminPass')||'';
+if(adminPass) document.getElementById('pass').value=adminPass;
+
+async function api(path,opts={}){
+  opts.headers=opts.headers||{};
+  if(adminPass) opts.headers['x-admin-password']=adminPass;
+  opts.headers['Content-Type']='application/json';
+  let res=await fetch(path,opts);
+  let d=await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(d.error||'Error');
+  return d;
+}
+
+async function login(){
+  let p=document.getElementById('pass').value;
+  try{
+    let res=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:p})});
+    let d=await res.json();
+    if(!res.ok) throw new Error(d.error);
+    adminPass=p; localStorage.setItem('adminPass',p);
+    document.getElementById('loginBox').style.display='none';
+    document.getElementById('panel').style.display='block';
+    await load();
+  }catch(e){document.getElementById('loginMsg').innerText=e.message;}
+}
+
+function logout(){localStorage.removeItem('adminPass'); location.reload();}
+
+async function load(){
+  try{
+    let res=await fetch('/api/data'); SITE_DATA=await res.json();
+    document.getElementById('siteName').value=SITE_DATA.siteName||'';
+    document.getElementById('heroBadge').value=SITE_DATA.hero?.badge||'';
+    document.getElementById('heroTitle').value=SITE_DATA.hero?.title||'';
+    document.getElementById('heroAccent').value=SITE_DATA.hero?.accent||'';
+    document.getElementById('heroSub').value=SITE_DATA.hero?.subtitle||'';
+    document.getElementById('footer').value=SITE_DATA.footer||'';
+    renderStats(); renderPackages(); renderBrokers(); renderWallets(); renderTestimonials(); renderFaq();
+    document.getElementById('msg').innerText='✅ Loaded - Exness + QR Upload Ready';
+  }catch(e){document.getElementById('msg').innerText='Load fail '+e.message}
+}
+
+async function saveSection(section,value){
+  try{
+    document.getElementById('msg').innerText='Saving '+section+'...';
+    await api('/api/admin/save',{method:'POST',body:JSON.stringify({section,value})});
+    document.getElementById('msg').innerText='✅ '+section+' saved! MongoDB Connected';
+  }catch(e){document.getElementById('msg').innerText='❌ '+e.message}
+}
+
+function saveHero(){
+  saveSection('siteName',siteName.value);
+  saveSection('hero',{badge:heroBadge.value,title:heroTitle.value,accent:heroAccent.value,subtitle:heroSub.value});
+  saveSection('footer',footer.value);
+}
+
+// Stats
+function renderStats(){
+  let h='';(SITE_DATA.stats||[]).forEach((s,i)=>{
+    h+=`<div class="item"><div class="row"><input placeholder="Number" value="${s.number||''}" data-i="${i}" data-k="number" class="stat-in"><input placeholder="Label" value="${s.label||''}" data-i="${i}" data-k="label" class="stat-in"></div><button class="btn-outline" onclick="removeStat(${i})">Remove</button></div>`
+  });
+  document.getElementById('statsEditor').innerHTML=h;
+}
+function getStats(){let arr=[]; document.querySelectorAll('.stat-in').forEach(el=>{let i=el.dataset.i,k=el.dataset.k; if(!arr[i]) arr[i]={}; arr[i][k]=el.value;}); return arr;}
+function addStat(){SITE_DATA.stats.push({number:"",label:""}); renderStats();}
+function removeStat(i){SITE_DATA.stats.splice(i,1); renderStats();}
+
+// Packages
+function renderPackages(){
+  let h='';(SITE_DATA.packages||[]).forEach((p,i)=>{
+    h+=`<div class="item"><div class="row"><input placeholder="ID" value="${p.id||''}" data-i="${i}" data-k="id" class="pkg-in"><input placeholder="Name" value="${p.name||''}" data-i="${i}" data-k="name" class="pkg-in"></div><div class="row"><input placeholder="Size" value="${p.size||''}" data-i="${i}" data-k="size" class="pkg-in"><input placeholder="Price" value="${p.price||''}" data-i="${i}" data-k="price" class="pkg-in"></div><div class="row"><input placeholder="Profit Split" value="${p.profitSplit||''}" data-i="${i}" data-k="profitSplit" class="pkg-in"><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" ${p.popular?'checked':''} data-i="${i}" data-k="popular" class="pkg-check"> Popular?</label></div><textarea placeholder="Features comma separated" data-i="${i}" data-k="features" class="pkg-in">${(p.features||[]).join(', ')}</textarea><button class="btn-outline" onclick="removePackage(${i})">Remove</button></div>`
+  });
+  document.getElementById('packagesEditor').innerHTML=h;
+}
+function getPackages(){let arr=[]; document.querySelectorAll('.pkg-in,.pkg-check').forEach(el=>{let i=el.dataset.i; if(!arr[i]) arr[i]={}; let k=el.dataset.k; if(k==='features') arr[i][k]=el.value.split(',').map(s=>s.trim()).filter(Boolean); else if(el.type==='checkbox') arr[i][k]=el.checked; else arr[i][k]=el.value;}); return arr;}
+function addPackage(){SITE_DATA.packages.push({id:Date.now().toString(),name:"New Package",size:"$10,000",price:"$99",profitSplit:"80%",features:["Instant"]}); renderPackages();}
+function removePackage(i){SITE_DATA.packages.splice(i,1); renderPackages();}
+
+// Brokers
+function renderBrokers(){
+  let h='';(SITE_DATA.brokers||[]).forEach((b,i)=>{
+    h+=`<div class="item"><input value="${b.name||''}" data-i="${i}" class="broker-in"><button class="btn-outline" onclick="removeBroker(${i})">Remove</button></div>`
+  });
+  document.getElementById('brokersEditor').innerHTML=h;
+}
+function getBrokers(){let arr=[]; document.querySelectorAll('.broker-in').forEach(el=>{arr.push({name:el.value});}); return arr;}
+function addBroker(){SITE_DATA.brokers.push({name:"Exness"}); renderBrokers();}
+function removeBroker(i){SITE_DATA.brokers.splice(i,1); renderBrokers();}
+
+// WALLETS - QR UPLOAD FIXED HERE
+function renderWallets(){
+  let h='';(SITE_DATA.wallets||[]).forEach((w,i)=>{
+    h+=`<div class="item">
+      <div class="row"><input placeholder="Network (Ex: USDT TRC20)" value="${w.network||''}" data-i="${i}" data-k="network" class="wallet-in"><input placeholder="Address" value="${w.address||''}" data-i="${i}" data-k="address" class="wallet-in"></div>
+      <input placeholder="QR Image URL (optional)" value="${w.qrImage||''}" data-i="${i}" data-k="qrImage" class="wallet-in" id="qr-input-${i}">
+      ${w.qrImage? `<img src="${w.qrImage}" class="qr-preview" id="qr-preview-${i}"><div style="font-size:11px;color:var(--accent)">✅ QR Loaded</div>` : `<div style="font-size:11px;color:var(--muted)">No QR yet</div>`}
+      <label class="upload-label" for="qr-file-${i}">📤 QR Image Upload Karo (Gallery se)</label>
+      <input type="file" id="qr-file-${i}" accept="image/*" style="display:none" onchange="uploadQR(${i}, this)">
+      <button class="btn-outline" onclick="removeWallet(${i})">Remove Wallet</button>
+    </div>`
+  });
+  document.getElementById('walletsEditor').innerHTML=h;
+}
+
+function uploadQR(index, input){
+  const file = input.files[0];
+  if(!file) return;
+  if(file.size > 2*1024*1024){ alert('Image 2MB se kam honi chahiye'); return; }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const base64 = e.target.result;
+    // Put into input
+    document.getElementById(`qr-input-${index}`).value = base64;
+    // Preview
+    let preview = document.getElementById(`qr-preview-${index}`);
+    if(preview){ preview.src = base64; }
+    else {
+      // Create preview if not exists
+      const img = document.createElement('img');
+      img.src = base64; img.className = 'qr-preview'; img.id = `qr-preview-${index}`;
+      input.parentElement.insertBefore(img, input);
+    }
+    document.getElementById('msg').innerText = '✅ QR image loaded! Ab Save Wallets dabao';
+  };
+  reader.readAsDataURL(file);
+}
+
+function getWallets(){
+  let arr=[];
+  document.querySelectorAll('.wallet-in').forEach(el=>{
+    let i=el.dataset.i,k=el.dataset.k;
+    if(!arr
