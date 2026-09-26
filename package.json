@@ -1,0 +1,14 @@
+{
+  "name": "funded-site",
+  "version": "2.0.0",
+  "description": "Funded trading account website with full CMS admin panel",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "setup": "node setup.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mongodb": "^6.10.0"
+  }
+}
