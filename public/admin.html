@@ -1,44 +1,82 @@
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const { MongoClient } = require('mongodb');
-const app = express();
-const PORT = process.env.PORT || 10000;
-const MONGODB_URI = process.env.MONGODB_URI;
-app.use(express.json({ limit: '10mb' }));
-app.use(express.static(path.join(__dirname, 'public')));
-function hashPassword(pw, salt) { return crypto.pbkdf2Sync(pw, salt, 100000, 64, 'sha512').toString('hex'); }
-let collection, ordersCollection;
-function getDefaultSeed() { try { return JSON.parse(fs.readFileSync(path.join(__dirname, 'data.json'), 'utf8')); } catch(e){ return { siteName:"FUNDEDPRO", siteSettings:{primaryColor:"#00ff88", backgroundColor:"#000000", textColor:"#ffffff", secondaryColor:"#111111"}, brokers:[], wallets:[], packages:[] }; } }
-async function getData() { return await collection.findOne({ _id: 'site' }); }
-async function saveField(s, v) { await collection.updateOne({ _id: 'site' }, { $set: { [s]: v } }); }
-function requireAuth(handler) { return async (req, res) => { try { const password = req.headers['x-admin-password']; if (!password) return res.status(401).json({ error: 'Unauthorized' }); const data = await getData(); const hash = hashPassword(password, data.admin.salt); if (hash!== data.admin.passwordHash) return res.status(401).json({ error: 'Unauthorized' }); await handler(req, res, data); } catch(err){ res.status(500).json({ error: 'Server error' }); } }; }
-app.get('/api/data', async (req, res) => { try { const doc = await getData(); const { admin, _id,...publicData } = doc; res.json(publicData); } catch(e){ res.status(500).json({ error: 'Failed' }); } });
-app.post('/api/admin/login', async (req, res) => { try { const { password } = req.body; const data = await getData(); const hash = hashPassword(password, data.admin.salt); if (hash === data.admin.passwordHash) return res.json({ ok: true }); res.status(401).json({ error: 'Ghalat password' }); } catch(e){ res.status(500).json({ error: 'Server error' }); } });
-app.post('/api/admin/save', requireAuth(async (req, res) => { await saveField(req.body.section, req.body.value); res.json({ ok: true }); }));
-app.get('/api/admin/orders', requireAuth(async (req,res)=>{ try{ const orders = await ordersCollection.find({}).sort({createdAt:-1}).limit(100).toArray(); res.json(orders); }catch(e){ res.status(500).json({error:'Failed'}); } }));
-app.post('/api/order', async (req,res)=>{ try{ const { package: pkg, wallet, customerName, customerEmail, txId, screenshot } = req.body; if(!customerName ||!customerEmail ||!screenshot) return res.status(400).json({error:'Missing fields'}); const order = { _id: crypto.randomBytes(12).toString('hex'), package: pkg, wallet, customerName, customerEmail, txId, screenshot, status: 'pending', createdAt: new Date() }; await ordersCollection.insertOne(order); res.json({ok:true, id: order._id}); }catch(e){ res.status(500).json({error:'Failed'}); } });
-app.get('/admin', (req,res) => { res.sendFile(path.join(__dirname, 'public', 'admin.html')); });
-app.use((req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
-async function start() {
-  const client = new MongoClient(MONGODB_URI);
-  await client.connect();
-  const db = client.db('fundedpro');
-  collection = db.collection('config');
-  ordersCollection = db.collection('orders');
-  const existing = await collection.findOne({ _id: 'site' });
-  if (!existing) {
-    const seed = getDefaultSeed();
-    const salt = crypto.randomBytes(16).toString('hex');
-    seed.admin = { salt, passwordHash: hashPassword('Admin7610', salt) };
-    seed._id = 'site';
-    await collection.insertOne(seed);
-  } else {
-    if(!existing.siteSettings){
-      await collection.updateOne({_id:'site'}, {$set:{siteSettings:{ primaryColor:"#00ff88", backgroundColor:"#000000", textColor:"#ffffff", secondaryColor:"#111111"}}});
-    }
-  }
-  app.listen(PORT, () => console.log('Server running ' + PORT));
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin</title>
+<style>body{background:#05070d;color:#fff;font-family:Arial;padding:16px;max-width:800px;margin:auto}input,textarea{width:100%;padding:11px;margin:6px 0;background:#0d1220;border:1px solid #1c2333;color:#fff;border-radius:8px;box-sizing:border-box}button{padding:10px 14px;background:#00e5a0;color:#000;border:none;border-radius:8px;font-weight:800;cursor:pointer;margin:4px}img.qr{width:120px;height:120px;background:#fff;border-radius:8px;display:block;margin:8px 0}.box{background:#0d1220;padding:12px;border-radius:10px;margin:12px 0;border:1px solid #1c2333}.color-row{display:flex;gap:8px;align-items:center}.color-row input[type=color]{width:70px;height:40px;padding:2px} h4{color:#00e5a0;margin:8px 0}</style>
+</head><body>
+<h2 style="color:#00e5a0;text-align:center">MTF ADMIN - FULL CONTROL</h2>
+<div id="login"><input type="password" id="pwd" value="Admin7610"><button id="btnLogin">LOGIN KRO</button><div id="msg">Ready</div></div>
+<div id="main" style="display:none">
+
+<div class="box"><h4>🎨 Colour Control - Poori Site Ka Colour Yahan Se</h4>
+<div class="color-row">Primary: <input type="color" id="c1"><input id="c1t" placeholder="#00e5a0"></div>
+<div class="color-row">Background: <input type="color" id="c2"><input id="c2t" placeholder="#000000"></div>
+<div class="color-row">Text: <input type="color" id="c3"><input id="c3t" placeholder="#ffffff"></div>
+<div class="color-row">Secondary Box: <input type="color" id="c4"><input id="c4t" placeholder="#111111"></div>
+<button id="btnSaveColor" style="background:#3b82f6;color:#fff">Save Colours</button>
+</div>
+
+<div class="box"><h4>🌐 Site Name & Hero Section</h4>
+Site Name: <input id="siteName">
+Hero Badge: <input id="heroBadge">
+Hero Title: <input id="heroTitle">
+Hero Accent (Green wala): <input id="heroAccent">
+Hero Subtitle: <textarea id="heroSubtitle" rows="2"></textarea>
+Footer Text: <input id="footerText">
+<button id="btnSaveHero" style="background:#3b82f6;color:#fff">Save Site & Hero</button>
+</div>
+
+<div class="box"><h4>📦 Packages - Pack Change Karo Yahan Se</h4>
+<div id="packsList"></div>
+<button id="btnAddPack">+ Add Pack</button>
+<button id="btnSavePacks" style="background:#3b82f6;color:#fff">Save Packs</button>
+</div>
+
+<div class="box"><h4>Wallets + QR Upload</h4><div id="walletsList"></div><button id="btnAddW">+ Add Wallet</button><button id="btnSaveW" style="background:#3b82f6;color:#fff">Save Wallets</button></div>
+
+<div class="box"><h4>Brokers</h4><div id="brokersList"></div><button id="btnAddB">+ Add Broker</button><button id="btnSaveB">Save Brokers</button></div>
+
+<div class="box"><h4>📊 Stats / Benefits / Steps / Testimonials / FAQ (JSON)</h4>
+Stats (JSON): <textarea id="stats" rows="3"></textarea><button id="btnSaveStats">Save Stats</button><br><br>
+Benefits (JSON): <textarea id="benefits" rows="5"></textarea><button id="btnSaveBenefits">Save Benefits</button><br><br>
+FAQ (JSON): <textarea id="faq" rows="5"></textarea><button id="btnSaveFaq">Save FAQ</button>
+</div>
+
+<div class="box"><h4>Orders - I Paid Proofs</h4><button id="btnLoadOrders" style="background:#00e5a0">Load Orders</button><div id="ordersList"></div></div>
+<a href="/" style="color:#00e5a0;display:block;text-align:center;margin-top:12px">View Site</a>
+</div>
+<script>
+let pass="";let data=null;
+function syncColor(a,b){document.getElementById(a).addEventListener('input',e=>document.getElementById(b).value=e.target.value); document.getElementById(b).addEventListener('input',e=>{try{document.getElementById(a).value=e.target.value}catch{}})}
+syncColor('c1','c1t'); syncColor('c2','c2t'); syncColor('c3','c3t'); syncColor('c4','c4t');
+
+document.getElementById("btnLogin").onclick=async function(){
+  let p=document.getElementById("pwd").value;
+  document.getElementById("msg").innerText="Checking...";
+  try{let r=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:p})});let j=await r.json();if(!r.ok) throw new Error(j.error);pass=p;localStorage.setItem("adminPass",p);document.getElementById("login").style.display="none";document.getElementById("main").style.display="block";let r2=await fetch("/api/data");data=await r2.json();showAll();}catch(e){document.getElementById("msg").innerText=e.message;}
+};
+function showAll(){
+  // Colors
+  let s=data.siteSettings||{}; document.getElementById('c1').value=s.primaryColor||'#00e5a0'; document.getElementById('c1t').value=s.primaryColor||'#00e5a0';
+  document.getElementById('c2').value=s.backgroundColor||'#05070d'; document.getElementById('c2t').value=s.backgroundColor||'#05070d';
+  document.getElementById('c3').value=s.textColor||'#ffffff'; document.getElementById('c3t').value=s.textColor||'#ffffff';
+  document.getElementById('c4').value=s.secondaryColor||'#0d1220'; document.getElementById('c4t').value=s.secondaryColor||'#0d1220';
+  // Site
+  document.getElementById('siteName').value=data.siteName||''; document.getElementById('heroBadge').value=data.hero?.badge||''; document.getElementById('heroTitle').value=data.hero?.title||''; document.getElementById('heroAccent').value=data.hero?.accent||''; document.getElementById('heroSubtitle').value=data.hero?.subtitle||''; document.getElementById('footerText').value=data.footer||'';
+  document.getElementById('stats').value=JSON.stringify(data.stats||[],null,2); document.getElementById('benefits').value=JSON.stringify(data.benefits||[],null,2); document.getElementById('faq').value=JSON.stringify(data.faq||[],null,2);
+  showWallets(); showBrokers(); showPacks();
 }
-start();
+function showPacks(){let h="";(data.packages||[]).forEach((p,i)=>{h+='<div class="box" style="border-color:#00e5a0"><input id="p-name-'+i+'" value="'+(p.name||'')+'" placeholder="Name"><input id="p-size-'+i+'" value="'+(p.size||'')+'" placeholder="Size $5000"><input id="p-price-'+i+'" value="'+(p.price||'')+'" placeholder="Price $29"><input id="p-split-'+i+'" value="'+(p.profitSplit||'')+'" placeholder="Profit 80%"><textarea id="p-feat-'+i+'" rows="2" placeholder="Features comma se">'+(p.features||[]).join(', ')+'</textarea><label><input type="checkbox" id="p-pop-'+i+'" '+(p.popular?'checked':'')+'> Popular</label> <button onclick="data.packages.splice('+i+',1);showPacks()" style="background:#ef4444;color:#fff">Delete</button></div>';});document.getElementById('packsList').innerHTML=h;}
+document.getElementById('btnAddPack').onclick=function(){data.packages.push({id:Date.now().toString(),name:"New Pack",size:"$10,000",price:"$49",profitSplit:"85%",features:["Instant Access"],popular:false});showPacks();};
+document.getElementById('btnSaveColor').onclick=async function(){let val={primaryColor:document.getElementById('c1t').value,backgroundColor:document.getElementById('c2t').value,textColor:document.getElementById('c3t').value,secondaryColor:document.getElementById('c4t').value};let r=await fetch("/api/admin/save",{method:"POST",headers:{"Content-Type":"application/json","x-admin-password":pass},body:JSON.stringify({section:"siteSettings",value:val})});alert(r.ok?"Colours Saved!":"Failed");};
+document.getElementById('btnSaveHero').onclick=async function(){let hero={badge:document.getElementById('heroBadge').value,title:document.getElementById('heroTitle').value,accent:document.getElementById('heroAccent').value,subtitle:document.getElementById('heroSubtitle').value};await fetch("/api/admin/save",{method:"POST",headers:{"Content-Type":"application/json","x-admin-password":pass},body:JSON.stringify({section:"hero",value:hero})});await fetch("/api/admin/save",{method:"POST",headers:{"Content-Type":"application/json","x-admin-password":pass},body:JSON.stringify({section:"siteName",value:document.getElementById('siteName').value})});await fetch("/api/admin/save",{method:"POST",headers:{"Content-Type":"application/json","x-admin-password":pass},body:JSON.stringify({section:"footer",value:document.getElementById('footerText').value})});alert("Hero & Site Saved");};
+document.getElementById('btnSavePacks').onclick=async function(){let arr=[];for(let i=0;i<data.packages.length;i++){arr.push({id:data.packages[i].id||Date.now().toString(),name:document.getElementById('p-name-'+i).value,size:document.getElementById('p-size-'+i).value,price:document.getElementById('p-price-'+i).value,profitSplit:document.getElementById('p-split-'+i).value,features:document.getElementById('p-feat-'+i).value.split(',').map(s=>s.trim()).filter(Boolean),popular:document.getElementById('p-pop-'+i).checked});}let r=await fetch("/api/admin/save",{method:"POST",headers:{"Content-Type":"application/json","x-admin-password":pass},body:JSON.stringify({section:"packages",value:arr})});if(r.ok){alert("Packs Saved");data.packages=arr;}else alert("Failed");};
+function showWallets(){let h="";for(let i=0;i<(data.wallets||[]).length;i++){let w=data.wallets[i];h+='<div class="box"><input id="w-net-'+i+'" value="'+(w.network||'').replace(/"/g,'')+'" placeholder="Network"><input id="w-addr-'+i+'" value="'+(w.address||'')+'" placeholder="Address">'+(w.qrImage?'<img class="qr" src="'+w.qrImage+'">':'<div style="color:#8892a6;font-size:11px">No QR</div>')+'<input type="file" accept="image/*" onchange="uploadQR('+i+',this)"><input type="hidden" id="w-qr-'+i+'"></div>';}document.getElementById("walletsList").innerHTML=h;setTimeout(()=>{for(let i=0;i<(data.wallets||[]).length;i++){let el=document.getElementById("w-qr-"+i);if(el) el.value=data.wallets[i].qrImage||"";}},100);}
+window.uploadQR=function(i,input){let f=input.files[0];if(!f)return;let r=new FileReader();r.onload=e=>{document.getElementById("w-qr-"+i).value=e.target.result;alert("QR Loaded! Save dabao");};r.readAsDataURL(f);};
+document.getElementById("btnAddW").onclick=function(){data.wallets.push({network:"USDT TRC20",address:"",qrImage:null});showWallets();};
+document.getElementById("btnSaveW").onclick=async function(){let arr=[];for(let i=0;i<data.wallets.length;i++){let net=document.getElementById("w-net-"+i).value;let addr=document.getElementById("w-addr-"+i).value;let qr=document.getElementById("w-qr-"+i).value||data.wallets[i].qrImage||null;arr.push({network:net,address:addr,qrImage:qr});}let r=await fetch("/api/admin/save",{method:"POST",headers:{"Content-Type":"application/json","x-admin-password":pass},body:JSON.stringify({section:"wallets",value:arr})});let j=await r.json();if(!r.ok) alert(j.error);else{alert("Wallets Saved");data.wallets=arr;}};
+function showBrokers(){let h="";for(let i=0;i<(data.brokers||[]).length;i++){h+='<div style="display:flex;gap:6px;margin:4px 0"><input id="b-'+i+'" value="'+data.brokers[i].name+'" style="flex:1"><button onclick="data.brokers.splice('+i+',1);showBrokers()" style="width:auto">X</button></div>';}document.getElementById("brokersList").innerHTML=h;}
+document.getElementById("btnAddB").onclick=function(){data.brokers.unshift({name:"Exness"});showBrokers();};
+document.getElementById("btnSaveB").onclick=async function(){let arr=[];for(let i=0;i<data.brokers.length;i++){arr.push({name:document.getElementById("b-"+i).value});}let r=await fetch("/api/admin/save",{method:"POST",headers:{"Content-Type":"application/json","x-admin-password":pass},body:JSON.stringify({section:"brokers",value:arr})});let j=await r.json();if(!r.ok) alert(j.error);else alert("Brokers Saved");};
+document.getElementById("btnSaveStats").onclick=async function(){try{let v=JSON.parse(document.getElementById('stats').value);await fetch("/api/admin/save",{method:"POST",headers:{"Content-Type":"application/json","x-admin-password":pass},body:JSON.stringify({section:"stats",value:v})});alert("Stats Saved")}catch(e){alert("JSON Ghalat")}};
+document.getElementById("btnSaveBenefits").onclick=async function(){try{let v=JSON.parse(document.getElementById('benefits').value);await fetch("/api/admin/save",{method:"POST",headers:{"Content-Type":"application/json","x-admin-password":pass},body:JSON.stringify({section:"benefits",value:v})});alert("Benefits Saved")}catch(e){alert("JSON Ghalat")}};
+document.getElementById("btnSaveFaq").onclick=async function(){try{let v=JSON.parse(document.getElementById('faq').value);await fetch("/api/admin/save",{method:"POST",headers:{"Content-Type":"application/json","x-admin-password":pass},body:JSON.stringify({section:"faq",value:v})});alert("FAQ Saved")}catch(e){alert("JSON Ghalat")}};
+document.getElementById("btnLoadOrders").onclick=async function(){let r=await fetch("/api/admin/orders",{headers:{"x-admin-password":pass}});let orders=await r.json();let h="";orders.forEach(o=>{h+='<div class="box"><b>'+o.customerName+'</b> - '+o.customerEmail+'<br>Package: '+(o.package?.name||'')+' '+ (o.package?.price||'')+'<br>Tx: '+(o.txId||'N/A')+'<br><img class="qr" style="width:200px;height:auto" src="'+o.screenshot+'"><br><small>'+new Date(o.createdAt).toLocaleString()+'</small></div>';});document.getElementById("ordersList").innerHTML=h||'No orders';};
+</script></body></html>
